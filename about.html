@@ -323,30 +323,57 @@ section {
   to { transform: rotate(360deg); }
 }
 
-/* ========== 关于区域 - 玻璃拟态卡片 ========== */
+/* ========== 关于区域 - 增强玻璃拟态卡片 ========== */
 .about-card {
   max-width: 720px;
   margin: 0 auto;
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(30, 41, 59, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 16px;
   padding: 2.5rem;
   box-shadow:
-    0 0 40px rgba(59, 130, 246, 0.15),
+    0 0 40px rgba(59, 130, 246, 0.12),
     0 8px 32px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
 }
 
+/* 顶部渐变条 */
 .about-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  opacity: 0.7;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899, #3b82f6);
+  background-size: 300% 100%;
+  animation: gradientSlide 4s ease infinite;
+  opacity: 0.8;
+}
+
+@keyframes gradientSlide {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* 右上角渐变光晕装饰 */
+.about-card::after {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 180px; height: 180px;
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* 左下角渐变光晕 */
+.about-card-glow-left {
+  position: absolute;
+  bottom: -40px; left: -40px;
+  width: 140px; height: 140px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .about-card-header {
@@ -355,6 +382,13 @@ section {
   gap: 1.25rem;
 }
 
+.about-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* 头像渐变旋转边框 */
 .about-avatar-circle {
   width: 64px; height: 64px;
   border-radius: 50%;
@@ -367,31 +401,70 @@ section {
   color: #fff;
   flex-shrink: 0;
   letter-spacing: 2px;
+  position: relative;
+  z-index: 1;
 }
 
-.about-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+.about-avatar-wrapper {
+  position: relative;
+  flex-shrink: 0;
 }
 
+.about-avatar-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #ec4899, #f59e0b, #3b82f6);
+  animation: avatarBorderSpin 6s linear infinite;
+  z-index: 0;
+}
+
+@keyframes avatarBorderSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* 姓名渐变色 */
 .about-name {
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  color: #fff;
   margin: 0;
   line-height: 1.2;
+  background: linear-gradient(135deg, #60A5FA, #A78BFA, #F472B6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
+/* 元信息左侧渐变竖线 */
 .about-meta {
   font-size: 0.85rem;
   color: #9CA3AF;
   margin: 0;
   line-height: 1.5;
+  padding-left: 0.75rem;
+  border-left: 2px solid transparent;
+  border-image: linear-gradient(to bottom, #3b82f6, #8b5cf6) 1;
 }
 
+/* 简介区域渐变装饰线 */
 .about-bio {
   margin: 1.75rem 0;
+  position: relative;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.04);
+  border: 1px solid rgba(59, 130, 246, 0.08);
+}
+
+.about-bio::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899);
 }
 
 .about-bio p {
@@ -401,6 +474,7 @@ section {
   margin: 0;
 }
 
+/* 技能标签 - 每个不同渐变色 */
 .about-tags {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -409,22 +483,64 @@ section {
 
 .about-tag {
   padding: 0.7rem 0;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 0.88rem;
   font-weight: 500;
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  color: #60A5FA;
-  background: rgba(59, 130, 246, 0.1);
   text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   cursor: default;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
 }
 
+.about-tag:nth-child(1) {
+  color: #60A5FA;
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.25);
+}
+.about-tag:nth-child(2) {
+  color: #A78BFA;
+  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(139, 92, 246, 0.25);
+}
+.about-tag:nth-child(3) {
+  color: #F472B6;
+  background: rgba(236, 72, 153, 0.1);
+  border-color: rgba(236, 72, 153, 0.25);
+}
+.about-tag:nth-child(4) {
+  color: #FBBF24;
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.about-tag::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.about-tag:nth-child(1)::before { background: linear-gradient(90deg, #3b82f6, #60A5FA); }
+.about-tag:nth-child(2)::before { background: linear-gradient(90deg, #7c3aed, #A78BFA); }
+.about-tag:nth-child(3)::before { background: linear-gradient(90deg, #db2777, #F472B6); }
+.about-tag:nth-child(4)::before { background: linear-gradient(90deg, #d97706, #FBBF24); }
+
 .about-tag:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(96, 165, 250, 0.5);
-  box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.about-tag:nth-child(1):hover { background: rgba(59, 130, 246, 0.2); box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15); }
+.about-tag:nth-child(2):hover { background: rgba(139, 92, 246, 0.2); box-shadow: 0 4px 20px rgba(139, 92, 246, 0.15); }
+.about-tag:nth-child(3):hover { background: rgba(236, 72, 153, 0.2); box-shadow: 0 4px 20px rgba(236, 72, 153, 0.15); }
+.about-tag:nth-child(4):hover { background: rgba(245, 158, 11, 0.2); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.15); }
+
+.about-tag:hover::before {
+  opacity: 1;
 }
 
 /* ========== 教育区域 ========== */
@@ -943,9 +1059,13 @@ section {
       <div class="section-line"></div>
     </div>
     <div class="about-card fade-in">
+      <!-- 左下角光晕 -->
+      <div class="about-card-glow-left"></div>
       <!-- 头部：头像 + 基本信息 -->
       <div class="about-card-header">
-        <div class="about-avatar-circle">徐</div>
+        <div class="about-avatar-wrapper">
+          <div class="about-avatar-circle">徐</div>
+        </div>
         <div class="about-info">
           <h3 class="about-name">徐梓豪</h3>
           <p class="about-meta">广东科学技术职业学院 · 商学院 · 商务数据分析与应用专业</p>
