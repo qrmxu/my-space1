@@ -327,17 +327,15 @@ section {
 .about-card {
   max-width: 720px;
   margin: 0 auto;
-  background: linear-gradient(135deg, rgba(26, 31, 62, 0.92), rgba(20, 24, 48, 0.96));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(74, 158, 255, 0.25);
-  border-radius: 20px;
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 16px;
   padding: 2.5rem;
   box-shadow:
-    0 0 0 1px rgba(74, 158, 255, 0.12),
-    0 8px 32px rgba(0, 0, 0, 0.5),
-    0 0 60px rgba(74, 158, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 0 40px rgba(59, 130, 246, 0.15),
+    0 8px 32px rgba(0, 0, 0, 0.4);
   position: relative;
   overflow: hidden;
 }
@@ -347,100 +345,85 @@ section {
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
   opacity: 0.7;
 }
 
 .about-card-header {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
 .about-avatar-circle {
-  width: 72px; height: 72px;
+  width: 64px; height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #3b82f6, #60a5fa, #818cf8);
+  background: #4A90D9;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.35);
   letter-spacing: 2px;
 }
 
 .about-info {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.35rem;
 }
 
 .about-name {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #fff;
   margin: 0;
+  line-height: 1.2;
 }
 
-.about-school {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  margin: 0;
-}
-
-.about-major {
+.about-meta {
   font-size: 0.85rem;
-  color: var(--neon-cyan);
+  color: #9CA3AF;
   margin: 0;
-  font-weight: 500;
-}
-
-.about-divider {
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(74, 158, 255, 0.2), transparent);
-  margin: 1.5rem 0;
+  line-height: 1.5;
 }
 
 .about-bio {
-  margin-bottom: 1.5rem;
+  margin: 1.75rem 0;
 }
 
 .about-bio p {
-  font-size: 0.92rem;
-  color: #cbd5e1;
-  line-height: 1.85;
-  margin-bottom: 0.8rem;
-}
-
-.about-bio p:last-child {
-  margin-bottom: 0;
+  font-size: 0.9rem;
+  color: #E2E8F0;
+  line-height: 1.8;
+  margin: 0;
 }
 
 .about-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 .about-tag {
-  padding: 0.45rem 1.1rem;
+  padding: 0.7rem 0;
   border-radius: 8px;
-  font-size: 0.82rem;
+  font-size: 0.88rem;
   font-weight: 500;
-  border: 1px solid rgba(74, 158, 255, 0.2);
-  color: #60a5fa;
-  background: rgba(37, 43, 74, 0.6);
-  transition: all 0.3s;
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: #60A5FA;
+  background: rgba(59, 130, 246, 0.1);
+  text-align: center;
+  transition: all 0.2s ease;
   cursor: default;
 }
 
 .about-tag:hover {
-  background: rgba(74, 158, 255, 0.12);
-  border-color: rgba(74, 158, 255, 0.4);
-  box-shadow: 0 0 12px rgba(74, 158, 255, 0.15);
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.15);
   transform: translateY(-2px);
 }
 
@@ -965,25 +948,19 @@ section {
         <div class="about-avatar-circle">徐</div>
         <div class="about-info">
           <h3 class="about-name">徐梓豪</h3>
-          <p class="about-school">广东科学技术职业学院 · 商学院</p>
-          <p class="about-major">商务数据分析与应用</p>
+          <p class="about-meta">广东科学技术职业学院 · 商学院 · 商务数据分析与应用专业</p>
         </div>
       </div>
-      <!-- 分割线 -->
-      <div class="about-divider"></div>
       <!-- 个人简介 -->
       <div class="about-bio">
-        <p>我是一名来自<span class="highlight">广东科学技术职业学院商学院</span>的学生，主修<span class="highlight">商务数据分析与应用</span>专业。热衷于用数据洞察商业价值，以技术赋能决策优化。</p>
-        <p>在AI浪潮下，我不断探索<span class="highlight">人工智能编程</span>与<span class="highlight">数据分析技术</span>的融合应用，致力于成为一名兼具技术深度与商业视野的复合型数据人才。</p>
+        <p>我是一名来自广东科学技术职业学院商学院的学生，主修商务数据分析与应用专业。热衷于用数据洞察商业价值，以技术赋能决策优化。在AI浪潮下，我不断探索人工智能编程与数据分析技术的融合应用，致力于成为一名兼具技术深度与商业视野的复合型数据人才。</p>
       </div>
       <!-- 技能标签 -->
       <div class="about-tags">
-        <span class="about-tag">Python</span>
         <span class="about-tag">数据分析</span>
-        <span class="about-tag">数据可视化</span>
         <span class="about-tag">AI编程</span>
-        <span class="about-tag">统计学</span>
-        <span class="about-tag">数据采集</span>
+        <span class="about-tag">数据可视化</span>
+        <span class="about-tag">商务智能</span>
       </div>
     </div>
   </div>
