@@ -436,102 +436,379 @@ section {
   transform: translateY(-2px);
 }
 
-/* ========== 教育区域 ========== */
-.education-card {
-  max-width: 800px;
-  margin: 0 auto;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+/* ========== 教育区域 - 全新设计 ========== */
+.edu-main-card {
+  max-width: 900px;
+  margin: 0 auto 2.5rem;
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(59, 130, 246, 0.15);
   border-radius: 16px;
-  padding: 3rem;
+  padding: 2rem;
   position: relative;
   overflow: hidden;
 }
 
-.education-card::before {
+.edu-main-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
 }
 
-.education-card .holo-badge {
-  position: absolute;
-  top: 1.5rem; right: 1.5rem;
-  padding: 0.3rem 1rem;
+.edu-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.edu-school-info {
+  flex: 1;
+}
+
+.edu-badge {
+  display: inline-block;
+  padding: 0.25rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.75rem;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(180, 74, 255, 0.15));
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  color: var(--neon-cyan);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  animation: holoShimmer 3s ease-in-out infinite;
-}
-
-@keyframes holoShimmer {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
-}
-
-.edu-school {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.edu-college {
-  font-size: 1.1rem;
-  color: var(--neon-purple);
-  margin-bottom: 0.5rem;
-}
-
-.edu-major {
-  font-size: 1.3rem;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
-}
-
-.edu-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
-.edu-detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.edu-detail-icon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.edu-detail-text .label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(139, 92, 246, 0.2));
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: #60A5FA;
+  margin-bottom: 0.8rem;
   letter-spacing: 1px;
 }
 
-.edu-detail-text .value {
+.edu-school-name {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 0.3rem;
+}
+
+.edu-dept {
   font-size: 0.95rem;
-  color: var(--text-primary);
+  color: #A78BFA;
+  margin: 0;
+}
+
+.edu-timeline {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.edu-date {
+  text-align: center;
+}
+
+.date-label {
+  display: block;
+  font-size: 0.7rem;
+  color: #64748b;
+  margin-bottom: 0.2rem;
+}
+
+.date-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.edu-date-line {
+  width: 100px;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.date-progress {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 4px;
+}
+
+.edu-major-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.edu-major-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.major-icon {
+  font-size: 1.2rem;
+}
+
+.major-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #60A5FA;
+}
+
+.edu-stats {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.edu-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+}
+
+/* 区块通用样式 */
+.edu-section {
+  max-width: 900px;
+  margin: 0 auto 2rem;
+}
+
+.edu-section-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.section-icon {
+  font-size: 1.3rem;
+}
+
+.edu-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  margin: 0;
+}
+
+.edu-section-count {
+  font-size: 0.75rem;
+  color: #64748b;
+  padding: 0.2rem 0.6rem;
+  background: rgba(255,255,255,0.05);
+  border-radius: 12px;
+}
+
+/* 课程网格 */
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.course-card {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.course-card:hover {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+
+.course-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--course-color, rgba(96, 165, 250, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.course-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.course-name {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  margin-bottom: 0.15rem;
+}
+
+.course-desc {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.course-tag {
+  font-size: 0.65rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60A5FA;
+  flex-shrink: 0;
+}
+
+/* 项目列表 */
+.projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.project-card {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.project-card:hover {
+  background: rgba(30, 41, 59, 0.55);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.project-line {
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #3b82f6, #8b5cf6, #ec4899);
+  flex-shrink: 0;
+}
+
+.project-content {
+  flex: 1;
+}
+
+.project-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.project-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #E2E8F0;
+  margin: 0;
+}
+
+.project-time {
+  font-size: 0.75rem;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.project-desc {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0 0 0.75rem;
+}
+
+.project-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.project-tag {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  background: rgba(139, 92, 246, 0.15);
+  color: #A78BFA;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+/* 荣誉网格 */
+.awards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.award-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.award-card:hover {
+  background: rgba(30, 41, 59, 0.55);
+  border-color: rgba(255,255,255,0.1);
+  transform: translateY(-2px);
+}
+
+.award-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.award-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.award-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.award-org {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.award-time {
+  font-size: 0.7rem;
+  color: #94a3b8;
 }
 
 /* ========== 技能区域 ========== */
@@ -944,49 +1221,232 @@ section {
   </ul>
 </nav>
 
-<div class="sub-page"><div id="main-content"><section id="education" style="background: var(--bg-secondary);">
+<div class="sub-page"><div id="main-content"><section id="education">
   <div class="container">
     <div class="section-header fade-in">
       <span class="section-tag">// EDUCATION</span>
       <h2 class="section-title">教育背景</h2>
       <div class="section-line"></div>
     </div>
-    <div class="education-card fade-in">
-      <span class="holo-badge">● 在读</span>
-      <h3 class="edu-school">广东科学技术职业学院</h3>
-      <p class="edu-college">商学院 · School of Business</p>
-      <p class="edu-major">商务数据分析与应用</p>
-      <div class="edu-details">
-        <div class="edu-detail-item">
-          <div class="edu-detail-icon">🎓</div>
-          <div class="edu-detail-text">
-            <div class="label">学历层次</div>
-            <div class="value">全日制专科</div>
+
+    <!-- 主卡片 -->
+    <div class="edu-main-card fade-in">
+      <div class="edu-card-header">
+        <div class="edu-school-info">
+          <div class="edu-badge">在读</div>
+          <h3 class="edu-school-name">广东科学技术职业学院</h3>
+          <p class="edu-dept">商学院 · School of Business</p>
+        </div>
+        <div class="edu-timeline">
+          <div class="edu-date">
+            <span class="date-label">入学</span>
+            <span class="date-value">2023.09</span>
+          </div>
+          <div class="edu-date-line">
+            <div class="date-progress" style="width: 66%;"></div>
+          </div>
+          <div class="edu-date">
+            <span class="date-label">预计毕业</span>
+            <span class="date-value">2026.06</span>
           </div>
         </div>
-        <div class="edu-detail-item">
-          <div class="edu-detail-icon">📚</div>
-          <div class="edu-detail-text">
-            <div class="label">专业方向</div>
-            <div class="value">商务数据分析与应用</div>
-          </div>
+      </div>
+
+      <div class="edu-major-section">
+        <div class="edu-major-tag">
+          <span class="major-icon">📊</span>
+          <span class="major-text">商务数据分析与应用</span>
         </div>
-        <div class="edu-detail-item">
-          <div class="edu-detail-icon">🤖</div>
-          <div class="edu-detail-text">
-            <div class="label">核心领域</div>
-            <div class="value">AI + 数据科学</div>
+        <div class="edu-stats">
+          <div class="edu-stat">
+            <span class="stat-value">全日制专科</span>
+            <span class="stat-label">学历层次</span>
           </div>
-        </div>
-        <div class="edu-detail-item">
-          <div class="edu-detail-icon">📍</div>
-          <div class="edu-detail-text">
-            <div class="label">所在城市</div>
-            <div class="value">广东 · 珠海</div>
+          <div class="edu-stat">
+            <span class="stat-value">AI + 数据科学</span>
+            <span class="stat-label">核心领域</span>
+          </div>
+          <div class="edu-stat">
+            <span class="stat-value">广东·珠海</span>
+            <span class="stat-label">所在城市</span>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 核心课程 -->
+    <div class="edu-section fade-in">
+      <div class="edu-section-header">
+        <span class="section-icon">📚</span>
+        <h4 class="edu-section-title">核心课程</h4>
+        <span class="edu-section-count">8门专业课</span>
+      </div>
+      <div class="courses-grid">
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #3b82f6;">🐍</div>
+          <div class="course-info">
+            <span class="course-name">Python数据分析</span>
+            <span class="course-desc">数据清洗、Pandas、NumPy</span>
+          </div>
+          <div class="course-tag">核心</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #8b5cf6;">🤖</div>
+          <div class="course-info">
+            <span class="course-name">机器学习基础</span>
+            <span class="course-desc">监督学习、模型评估</span>
+          </div>
+          <div class="course-tag">核心</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #06b6d4;">📈</div>
+          <div class="course-info">
+            <span class="course-name">数据可视化</span>
+            <span class="course-desc">ECharts、Tableau、大屏设计</span>
+          </div>
+          <div class="course-tag">核心</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #f59e0b;">📊</div>
+          <div class="course-info">
+            <span class="course-name">应用统计学</span>
+            <span class="course-desc">假设检验、回归分析</span>
+          </div>
+          <div class="course-tag">核心</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #ec4899;">🗄️</div>
+          <div class="course-info">
+            <span class="course-name">数据库原理</span>
+            <span class="course-desc">SQL、MySQL、数据建模</span>
+          </div>
+          <div class="course-tag">必修</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #22c55e;">🌐</div>
+          <div class="course-info">
+            <span class="course-name">数据采集技术</span>
+            <span class="course-desc">爬虫、API、数据清洗</span>
+          </div>
+          <div class="course-tag">必修</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #6366f1;">💼</div>
+          <div class="course-info">
+            <span class="course-name">商业智能分析</span>
+            <span class="course-desc">BI工具、数据驱动决策</span>
+          </div>
+          <div class="course-tag">必修</div>
+        </div>
+        <div class="course-card">
+          <div class="course-icon" style="--course-color: #f97316;">📝</div>
+          <div class="course-info">
+            <span class="course-name">数据挖掘实务</span>
+            <span class="course-desc">关联规则、聚类分析</span>
+          </div>
+          <div class="course-tag">必修</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 项目经历 -->
+    <div class="edu-section fade-in">
+      <div class="edu-section-header">
+        <span class="section-icon">🚀</span>
+        <h4 class="edu-section-title">项目经历</h4>
+        <span class="edu-section-count">3个实战项目</span>
+      </div>
+      <div class="projects-list">
+        <div class="project-card">
+          <div class="project-line"></div>
+          <div class="project-content">
+            <div class="project-header">
+              <h5 class="project-name">电商用户行为分析平台</h5>
+              <span class="project-time">2024.10 - 2024.12</span>
+            </div>
+            <p class="project-desc">基于Python和MySQL构建电商用户行为分析系统，实现用户画像、RFM模型分析、购买预测等功能，为运营决策提供数据支撑。</p>
+            <div class="project-tags">
+              <span class="project-tag">Python</span>
+              <span class="project-tag">MySQL</span>
+              <span class="project-tag">数据可视化</span>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-line"></div>
+          <div class="project-content">
+            <div class="project-header">
+              <h5 class="project-name">珠海交通流量数据可视化大屏</h5>
+              <span class="project-time">2024.06 - 2024.09</span>
+            </div>
+            <p class="project-desc">使用ECharts开发城市交通数据可视化大屏，实时展示道路拥堵指数、车流量统计、事故热力图等关键指标。</p>
+            <div class="project-tags">
+              <span class="project-tag">ECharts</span>
+              <span class="project-tag">数据大屏</span>
+              <span class="project-tag">实时数据</span>
+            </div>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-line"></div>
+          <div class="project-content">
+            <div class="project-header">
+              <h5 class="project-name">Kaggle房价预测竞赛</h5>
+              <span class="project-time">2024.03 - 2024.05</span>
+            </div>
+            <p class="project-desc">参与Kaggle房价预测竞赛，运用特征工程、集成学习等方法，最终排名进入Top 15%，深入理解机器学习实战流程。</p>
+            <div class="project-tags">
+              <span class="project-tag">机器学习</span>
+              <span class="project-tag">特征工程</span>
+              <span class="project-tag">Kaggle</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 荣誉证书 -->
+    <div class="edu-section fade-in">
+      <div class="edu-section-header">
+        <span class="section-icon">🏆</span>
+        <h4 class="edu-section-title">荣誉证书</h4>
+      </div>
+      <div class="awards-grid">
+        <div class="award-card">
+          <div class="award-icon">🥇</div>
+          <div class="award-info">
+            <span class="award-name">校级专业技能竞赛一等奖</span>
+            <span class="award-org">广东科学技术职业学院</span>
+            <span class="award-time">2024.11</span>
+          </div>
+        </div>
+        <div class="award-card">
+          <div class="award-icon">📜</div>
+          <div class="award-info">
+            <span class="award-name">Python数据分析认证</span>
+            <span class="award-org">中国计算机学会</span>
+            <span class="award-time">2024.06</span>
+          </div>
+        </div>
+        <div class="award-card">
+          <div class="award-icon">🎖️</div>
+          <div class="award-info">
+            <span class="award-name">优秀学生干部</span>
+            <span class="award-org">广东科学技术职业学院</span>
+            <span class="award-time">2023.12</span>
+          </div>
+        </div>
+        <div class="award-card">
+          <div class="award-icon">🏅</div>
+          <div class="award-info">
+            <span class="award-name">数学建模竞赛校级三等奖</span>
+            <span class="award-org">广东科学技术职业学院</span>
+            <span class="award-time">2024.05</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section></div></div>
 
