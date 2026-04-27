@@ -634,45 +634,45 @@ section {
   opacity: 0.9;
   transform: scale(1.15);
 }
-/* 训练营按钮 - 跳转链接 */
+/* 训练营跳转按钮 */
 .skill-card-bottom {
   display: flex;
   justify-content: flex-end;
   margin-top: 0.8rem;
 }
-
 .camp-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.45rem 1.1rem;
+  padding: 0.5rem 1.2rem;
   border-radius: 8px;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #fff;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3));
-  border: 1px solid rgba(96, 165, 250, 0.35);
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border: none;
   text-decoration: none;
   transition: all 0.3s;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+  letter-spacing: 0.5px;
 }
 .camp-btn::before {
   content: '';
   position: absolute;
   top: 0; left: -100%;
   width: 300%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
   transition: left 0.5s;
 }
 .camp-btn:hover::before {
   left: 100%;
 }
 .camp-btn:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.5), rgba(139, 92, 246, 0.5));
-  border-color: rgba(96, 165, 250, 0.6);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25), 0 0 40px rgba(139, 92, 246, 0.1);
-  transform: translateY(-1px);
+  box-shadow: 0 4px 24px rgba(59, 130, 246, 0.45), 0 0 40px rgba(139, 92, 246, 0.15);
+  transform: translateY(-2px);
 }
 
 }
@@ -1367,6 +1367,8 @@ document.querySelectorAll('.hobby-card').forEach(card => {
     var href = link.getAttribute('href');
     if (!href || !href.endsWith('.html')) return;
     if (href === window.location.pathname.split('/').pop()) return;
+    // 训练营页面使用普通跳转，不经过SPA
+    if (href.startsWith('camp-')) return;
 
     e.preventDefault();
 
