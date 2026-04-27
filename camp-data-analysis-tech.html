@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>数据分析技术训练营 | 徐梓豪</title>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据分析技术训练营 | 徐梓豪</title>
 <style>
 /* ========== CSS 变量 & 全局重置 ========== */
 :root {
@@ -959,165 +965,54 @@ section {
   opacity: 0;
 }
 </style>
-/* ========== 训练营页面 ========== */
-.camp-hero {
-  text-align: center;
-  padding: 2rem 0 1rem;
-}
-.camp-hero-icon {
-  font-size: 3.5rem;
-  margin-bottom: 1rem;
-  display: inline-block;
-  animation: campFloat 3s ease-in-out infinite;
-}
-@keyframes campFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-.camp-hero h2 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #ec4899, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 0.5rem;
-}
-.camp-hero p {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  margin: 0;
-}
 
-.camp-stats {
-  display: flex;
-  justify-content: center;
-  gap: 2.5rem;
-  margin: 1.5rem 0 2rem;
-  padding: 1.2rem;
-  background: rgba(30, 41, 59, 0.4);
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
-}
-.camp-stat {
-  text-align: center;
-}
-.camp-stat-num {
-  font-size: 1.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #ec4899, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.camp-stat-label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: 0.2rem;
-}
+/* ========== 训练营增强版 ========== */
+.container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+.camp-hero { text-align: center; padding: 2rem 0 1rem; }
+.camp-hero-icon { font-size: 3rem; margin-bottom: 0.8rem; display: inline-block; animation: campFloat 3s ease-in-out infinite; }
+@keyframes campFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.camp-hero h2 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0 0 0.4rem; }
+.camp-hero p { color: #94a3b8; font-size: 0.9rem; margin: 0; }
 
-.camp-modules {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
+.camp-stats { display: flex; justify-content: center; gap: 2.5rem; margin: 1.5rem 0; padding: 1.2rem; background: rgba(30,41,59,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+.camp-stat { text-align: center; }
+.camp-stat-num { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.camp-stat-label { font-size: 0.75rem; color: #64748b; margin-top: 0.2rem; }
 
-.camp-module {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
-  background: rgba(30, 41, 59, 0.35);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-.camp-module::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 3px;
-  background: linear-gradient(to bottom, #ec4899, #f59e0b);
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.camp-module:hover {
-  background: rgba(30, 41, 59, 0.55);
-  border-color: rgba(255,255,255,0.1);
-  transform: translateX(4px);
-}
-.camp-module:hover::before {
-  opacity: 1;
-}
+.module-card { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; transition: all 0.3s; position: relative; overflow: hidden; }
+.module-card::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #ec4899, #f59e0b); opacity: 0.5; }
+.module-card:hover { border-color: rgba(255,255,255,0.1); background: rgba(30,41,59,0.55); }
 
-.module-num {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #ec4899;
-  opacity: 0.6;
-  min-width: 2rem;
-  text-align: center;
-}
+.module-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
+.module-header-left { display: flex; align-items: center; gap: 0.75rem; }
+.module-icon { font-size: 1.5rem; }
+.module-number { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
+.module-title-text { font-size: 1.1rem; font-weight: 600; color: #E2E8F0; margin: 0.15rem 0 0; }
+.module-meta { display: flex; gap: 0.5rem; }
+.meta-tag { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 12px; background: rgba(236,72,153,0.12); color: #F472B6; border: 1px solid rgba(236,72,153,0.2); }
 
-.module-info {
-  flex: 1;
-}
+.module-section { margin-bottom: 1.25rem; }
+.module-section:last-child { margin-bottom: 0; }
+.section-label { font-size: 0.8rem; font-weight: 600; color: #A78BFA; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem; }
 
-.module-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #E2E8F0;
-  margin: 0 0 0.4rem;
-}
+.method-text { font-size: 0.88rem; color: #cbd5e1; line-height: 1.8; margin: 0; padding: 1rem 1.25rem; background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.1); border-radius: 10px; }
 
-.module-progress {
-  height: 3px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 3px;
-  overflow: hidden;
-}
+.steps-list { display: flex; flex-direction: column; gap: 0.6rem; }
+.learn-step { display: flex; gap: 0.75rem; align-items: flex-start; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, rgba(236,72,153,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(236,72,153,0.3); color: #F472B6; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }
+.step-content { flex: 1; }
+.step-title { font-size: 0.88rem; font-weight: 600; color: #E2E8F0; margin: 0 0 0.2rem; }
+.step-desc { font-size: 0.82rem; color: #94a3b8; line-height: 1.6; margin: 0; }
 
-.module-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ec4899, #f59e0b);
-  border-radius: 3px;
-  transition: width 1s ease;
-}
+.exercises-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.exercise-item { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.6rem 0.8rem; background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.08); border-radius: 8px; }
+.exercise-num { font-size: 0.7rem; font-weight: 600; color: #FBBF24; background: rgba(245,158,11,0.12); padding: 0.15rem 0.5rem; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 0.05rem; }
+.exercise-text { font-size: 0.82rem; color: #cbd5e1; line-height: 1.6; margin: 0; }
 
-.module-status {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.08);
-  white-space: nowrap;
-}
+.camp-back { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; padding: 0.6rem 1.5rem; border-radius: 8px; font-size: 0.85rem; color: #94a3b8; background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.08); text-decoration: none; transition: all 0.3s; }
+.camp-back:hover { color: #fff; background: rgba(30,41,59,0.6); border-color: rgba(255,255,255,0.15); }
+.camp-back svg { width: 16px; height: 16px; }
 
-.camp-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 2rem;
-  padding: 0.6rem 1.5rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  color: #94a3b8;
-  background: rgba(30, 41, 59, 0.4);
-  border: 1px solid rgba(255,255,255,0.08);
-  text-decoration: none;
-  transition: all 0.3s;
-}
-.camp-back:hover {
-  color: #fff;
-  background: rgba(30, 41, 59, 0.6);
-  border-color: rgba(255,255,255,0.15);
-}
-.camp-back svg {
-  width: 16px; height: 16px;
-}
 </style>
 </head>
 <body>
@@ -1138,11 +1033,11 @@ section {
 </nav>
 
 <div class="sub-page"><div id="main-content">
-  <div class="container" style="max-width: 640px;">
+  <div class="container">
     <div class="camp-hero fade-in">
       <div class="camp-hero-icon">🔍</div>
       <h2>数据分析技术训练营</h2>
-      <p>系统化学习路径 · 从入门到精通</p>
+      <p>从零基础到实战 · 6大模块 · 方法+教程+练习</p>
     </div>
 
     <div class="camp-stats fade-in">
@@ -1151,77 +1046,530 @@ section {
         <div class="camp-stat-label">课程模块</div>
       </div>
       <div class="camp-stat">
-        <div class="camp-stat-num">0%</div>
-        <div class="camp-stat-label">完成进度</div>
+        <div class="camp-stat-num">30</div>
+        <div class="camp-stat-label">教程步骤</div>
       </div>
       <div class="camp-stat">
-        <div class="camp-stat-num">∞</div>
-        <div class="camp-stat-label">学习时长</div>
+        <div class="camp-stat-num">24</div>
+        <div class="camp-stat-label">实战练习</div>
+      </div>
+      <div class="camp-stat">
+        <div class="camp-stat-num">15周</div>
+        <div class="camp-stat-label">建议周期</div>
       </div>
     </div>
 
-    <div class="camp-modules">
-          <div class="camp-module fade-in">
-            <div class="module-num">01</div>
-            <div class="module-info">
-              <h4 class="module-title">数据清洗与预处理</h4>
-              <div class="module-progress">
-                <div class="module-bar" style="--bar-color: #ec4899;"></div>
-              </div>
+    
+      <div class="module-card fade-in">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-icon">🧹</span>
+            <div>
+              <span class="module-number">模块 01</span>
+              <h3 class="module-title-text">数据清洗与预处理</h3>
             </div>
-            <span class="module-status">待学习</span>
           </div>
-          <div class="camp-module fade-in">
-            <div class="module-num">02</div>
-            <div class="module-info">
-              <h4 class="module-title">特征工程实战</h4>
-              <div class="module-progress">
-                <div class="module-bar" style="--bar-color: #ec4899;"></div>
+          <div class="module-meta">
+            <span class="meta-tag">入门</span>
+            <span class="meta-tag">2周</span>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📖 学习方法</div>
+          <p class="method-text">「脏数据 → 干净数据」是数据分析的第一步。学习方法：先理解"什么是脏数据"（缺失值、重复值、异常值、格式错误），再动手用 Python/Pandas 逐个解决。建议用真实数据集练习，比如 Kaggle 上的 Titanic 数据集——它有缺失值、有分类编码、有异常值，非常适合入门。</p>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📝 教程步骤</div>
+          <div class="steps-list">
+            
+              <div class="learn-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h5 class="step-title">认识脏数据</h5>
+                  <p class="step-desc">打开一个 CSV 文件，用 Pandas 的 df.info() 和 df.describe() 观察数据全貌，找出哪些列有缺失值、哪些数据类型不对</p>
+                </div>
               </div>
-            </div>
-            <span class="module-status">待学习</span>
-          </div>
-          <div class="camp-module fade-in">
-            <div class="module-num">03</div>
-            <div class="module-info">
-              <h4 class="module-title">数据建模与分析</h4>
-              <div class="module-progress">
-                <div class="module-bar" style="--bar-color: #ec4899;"></div>
+              <div class="learn-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h5 class="step-title">处理缺失值</h5>
+                  <p class="step-desc">学习 df.isnull().sum() 统计缺失、df.fillna() 填充、df.dropna() 删除。理解什么时候该填充（均值/中位数/众数）、什么时候该删除</p>
+                </div>
               </div>
-            </div>
-            <span class="module-status">待学习</span>
-          </div>
-          <div class="camp-module fade-in">
-            <div class="module-num">04</div>
-            <div class="module-info">
-              <h4 class="module-title">SQL 高级查询技巧</h4>
-              <div class="module-progress">
-                <div class="module-bar" style="--bar-color: #ec4899;"></div>
+              <div class="learn-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h5 class="step-title">处理重复值</h5>
+                  <p class="step-desc">学习 df.duplicated() 检测重复、df.drop_duplicates() 去重。理解"完全重复"和"部分重复"的区别</p>
+                </div>
               </div>
-            </div>
-            <span class="module-status">待学习</span>
-          </div>
-          <div class="camp-module fade-in">
-            <div class="module-num">05</div>
-            <div class="module-info">
-              <h4 class="module-title">Python 数据分析库</h4>
-              <div class="module-progress">
-                <div class="module-bar" style="--bar-color: #ec4899;"></div>
+              <div class="learn-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h5 class="step-title">处理异常值</h5>
+                  <p class="step-desc">学习用箱线图（boxplot）和 IQR 方法识别异常值，理解 3σ 原则，决定是删除、修正还是保留异常值</p>
+                </div>
               </div>
-            </div>
-            <span class="module-status">待学习</span>
-          </div>
-          <div class="camp-module fade-in">
-            <div class="module-num">06</div>
-            <div class="module-info">
-              <h4 class="module-title">数据挖掘算法应用</h4>
-              <div class="module-progress">
-                <div class="module-bar" style="--bar-color: #ec4899;"></div>
+              <div class="learn-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <h5 class="step-title">数据类型转换</h5>
+                  <p class="step-desc">学习 astype() 转换数据类型、pd.to_datetime() 处理日期、字符串拆分与合并</p>
+                </div>
               </div>
-            </div>
-            <span class="module-status">待学习</span>
           </div>
-    </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">💪 练习题</div>
+          <div class="exercises-list">
+            
+              <div class="exercise-item">
+                <span class="exercise-num">练习 1</span>
+                <p class="exercise-text">打开 Titanic 数据集，统计每列的缺失值数量，用合适的方法填充 Age 列的缺失值</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 2</span>
+                <p class="exercise-text">找出数据中所有重复行并删除，验证去重后行数是否正确</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 3</span>
+                <p class="exercise-text">用箱线图找出 Fare 列的异常值，选择一种合理方式处理</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 4</span>
+                <p class="exercise-text">将 Sex 列从文字转为数字编码（male=1, female=0），将 Embarked 列转为独热编码</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-card fade-in">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-icon">⚙️</span>
+            <div>
+              <span class="module-number">模块 02</span>
+              <h3 class="module-title-text">特征工程实战</h3>
+            </div>
+          </div>
+          <div class="module-meta">
+            <span class="meta-tag">进阶</span>
+            <span class="meta-tag">2周</span>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📖 学习方法</div>
+          <p class="method-text">特征工程是"把原始数据变成模型能理解的数字"的过程。学习方法：先理解"为什么需要特征工程"（原始数据往往不能直接喂给模型），再学习常用技巧。核心思想是：用领域知识创造新特征，让模型更容易发现规律。</p>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📝 教程步骤</div>
+          <div class="steps-list">
+            
+              <div class="learn-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h5 class="step-title">理解特征工程</h5>
+                  <p class="step-desc">什么是特征？为什么特征比模型更重要？好的特征能让简单模型超越复杂模型。学习"垃圾进，垃圾出"原则</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h5 class="step-title">数值特征处理</h5>
+                  <p class="step-desc">学习标准化（StandardScaler）、归一化（MinMaxScaler）、对数变换、分箱（binning）等技巧</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h5 class="step-title">分类特征编码</h5>
+                  <p class="step-desc">学习标签编码（LabelEncoder）、独热编码（OneHotEncoder）、目标编码（TargetEncoder），理解各自的适用场景</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h5 class="step-title">特征创建</h5>
+                  <p class="step-desc">从现有特征中创造新特征：日期拆分（年/月/日/星期）、文本提取（字数/词频）、数学组合（加减乘除/比率）</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <h5 class="step-title">特征选择</h5>
+                  <p class="step-desc">学习相关性分析、方差阈值过滤、递归特征消除（RFE），理解"不是特征越多越好"</p>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">💪 练习题</div>
+          <div class="exercises-list">
+            
+              <div class="exercise-item">
+                <span class="exercise-num">练习 1</span>
+                <p class="exercise-text">对 House Prices 数据集进行特征工程：创建"房屋年龄"特征（建造年份→至今的年数）</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 2</span>
+                <p class="exercise-text">对分类特征进行独热编码，对比编码前后的数据维度变化</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 3</span>
+                <p class="exercise-text">计算所有数值特征与目标变量的相关系数，选出 Top 10 最相关的特征</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 4</span>
+                <p class="exercise-text">尝试用对数变换处理偏态分布的价格数据，观察变换前后的分布差异</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-card fade-in">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-icon">📊</span>
+            <div>
+              <span class="module-number">模块 03</span>
+              <h3 class="module-title-text">数据建模与分析</h3>
+            </div>
+          </div>
+          <div class="module-meta">
+            <span class="meta-tag">进阶</span>
+            <span class="meta-tag">3周</span>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📖 学习方法</div>
+          <p class="method-text">数据建模是用数学方法从数据中发现规律的过程。学习方法：从最简单的线性回归开始，逐步过渡到决策树、随机森林。每个模型都按"理解原理→代码实现→评估效果"三步走。不要追求模型的复杂度，先确保理解基础。</p>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📝 教程步骤</div>
+          <div class="steps-list">
+            
+              <div class="learn-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h5 class="step-title">回归分析入门</h5>
+                  <p class="step-desc">理解"用一条线拟合数据"的思想。学习线性回归的原理、损失函数（MSE）、梯度下降。用代码实现预测房价</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h5 class="step-title">分类分析入门</h5>
+                  <p class="step-desc">理解"把数据分成几类"的思想。学习逻辑回归、决策树。用代码实现预测用户是否会购买</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h5 class="step-title">模型评估指标</h5>
+                  <p class="step-desc">回归用 R²/MAE/RMSE，分类用 准确率/精确率/召回率/F1。理解"准确率高不等于模型好"（类别不平衡问题）</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h5 class="step-title">训练集与测试集</h5>
+                  <p class="step-desc">理解为什么要拆分数据。学习 train_test_split、交叉验证（Cross Validation）。理解过拟合和欠拟合</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <h5 class="step-title">集成学习方法</h5>
+                  <p class="step-desc">学习随机森林（多棵树投票）、梯度提升（XGBoost/LightGBM）。理解"三个臭皮匠顶个诸葛亮"的集成思想</p>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">💪 练习题</div>
+          <div class="exercises-list">
+            
+              <div class="exercise-item">
+                <span class="exercise-num">练习 1</span>
+                <p class="exercise-text">用线性回归预测波士顿房价，计算 R² 分数和 MAE，画出预测值 vs 真实值的散点图</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 2</span>
+                <p class="exercise-text">用逻辑回归预测客户流失，计算精确率和召回率，思考哪个指标更重要</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 3</span>
+                <p class="exercise-text">对比决策树和随机森林在同一数据集上的表现，理解为什么随机森林通常更好</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 4</span>
+                <p class="exercise-text">用 5 折交叉验证评估模型稳定性，观察不同折的分数波动</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-card fade-in">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-icon">🗄️</span>
+            <div>
+              <span class="module-number">模块 04</span>
+              <h3 class="module-title-text">SQL 高级查询技巧</h3>
+            </div>
+          </div>
+          <div class="module-meta">
+            <span class="meta-tag">入门</span>
+            <span class="meta-tag">2周</span>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📖 学习方法</div>
+          <p class="method-text">SQL 是数据分析的"母语"，几乎所有数据工作都离不开它。学习方法：先掌握基础查询（SELECT/WHERE/GROUP BY），再学高级技巧（窗口函数/子查询/CTE）。每天写 1-2 道 SQL 题，在 LeetCode 或牛客网上刷题是最快的进步方式。</p>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📝 教程步骤</div>
+          <div class="steps-list">
+            
+              <div class="learn-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h5 class="step-title">SQL 基础查询</h5>
+                  <p class="step-desc">掌握 SELECT、WHERE、ORDER BY、LIMIT。学会用 WHERE 过滤数据，用 ORDER BY 排序，用 LIMIT 分页</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h5 class="step-title">聚合与分组</h5>
+                  <p class="step-desc">掌握 GROUP BY、HAVING、COUNT/SUM/AVG/MAX/MIN。理解 GROUP BY 和 WHERE 的区别（WHERE 过滤行，HAVING 过滤组）</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h5 class="step-title">多表关联</h5>
+                  <p class="step-desc">掌握 INNER JOIN、LEFT JOIN、RIGHT JOIN、FULL JOIN。理解不同 JOIN 的区别，学会用 ON 指定关联条件</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h5 class="step-title">子查询与 CTE</h5>
+                  <p class="step-desc">学习子查询（WHERE 中的 SELECT）、CTE（WITH ... AS）。理解什么时候用子查询、什么时候用 JOIN</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <h5 class="step-title">窗口函数</h5>
+                  <p class="step-desc">学习 ROW_NUMBER/RANK/DENSE_RANK、LAG/LEAD、SUM OVER。这是 SQL 最强大的功能，面试必考</p>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">💪 练习题</div>
+          <div class="exercises-list">
+            
+              <div class="exercise-item">
+                <span class="exercise-num">练习 1</span>
+                <p class="exercise-text">写一个 SQL 查询：找出每个部门的平均工资，只显示平均工资大于 5000 的部门</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 2</span>
+                <p class="exercise-text">写一个 SQL 查询：找出工资最高的前 3 名员工，用窗口函数实现</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 3</span>
+                <p class="exercise-text">写一个 SQL 查询：计算每个员工与其上一个月的工资差额（用 LAG 函数）</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 4</span>
+                <p class="exercise-text">写一个 SQL 查询：找出连续 3 天都有登录记录的用户（经典面试题）</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-card fade-in">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-icon">🐍</span>
+            <div>
+              <span class="module-number">模块 05</span>
+              <h3 class="module-title-text">Python 数据分析库</h3>
+            </div>
+          </div>
+          <div class="module-meta">
+            <span class="meta-tag">入门</span>
+            <span class="meta-tag">3周</span>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📖 学习方法</div>
+          <p class="method-text">Python 数据分析三大件：Pandas（数据处理）、NumPy（数值计算）、Matplotlib/Seaborn（可视化）。学习方法：不要死记 API，而是理解"数据结构"——Series 是一维数组，DataFrame 是二维表格。所有操作都是"对表格的增删改查"。</p>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📝 教程步骤</div>
+          <div class="steps-list">
+            
+              <div class="learn-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h5 class="step-title">NumPy 基础</h5>
+                  <p class="step-desc">学习 ndarray 数组的创建、索引、运算。理解向量化操作比循环快 100 倍。掌握广播机制</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h5 class="step-title">Pandas 数据读取</h5>
+                  <p class="step-desc">学习 read_csv/read_excel/read_sql 读取数据。理解 df.shape/df.columns/df.dtypes 等基础属性</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h5 class="step-title">Pandas 数据筛选</h5>
+                  <p class="step-desc">学习 df[条件]、df.loc[]、df.iloc[] 三种筛选方式。掌握多条件组合筛选（&/|/~）</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h5 class="step-title">Pandas 数据聚合</h5>
+                  <p class="step-desc">学习 groupby()+agg()、pivot_table()、merge()。理解"分组→聚合→合并"的分析流程</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <h5 class="step-title">Matplotlib 可视化</h5>
+                  <p class="step-desc">学习折线图/柱状图/散点图/直方图/箱线图的绘制。掌握图表美化（标题/标签/颜色/大小）</p>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">💪 练习题</div>
+          <div class="exercises-list">
+            
+              <div class="exercise-item">
+                <span class="exercise-num">练习 1</span>
+                <p class="exercise-text">用 Pandas 读取一个 CSV 文件，筛选出年龄在 20-30 岁且工资大于 5000 的员工</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 2</span>
+                <p class="exercise-text">用 groupby 按部门分组，计算每个部门的人数、平均工资、最高工资</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 3</span>
+                <p class="exercise-text">用 merge 将员工表和部门表关联，找出每个员工所属的部门名称</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 4</span>
+                <p class="exercise-text">用 Matplotlib 画出各部门平均工资的柱状图，并标注数值</p>
+              </div>
+          </div>
+        </div>
+      </div>
+      <div class="module-card fade-in">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-icon">⛏️</span>
+            <div>
+              <span class="module-number">模块 06</span>
+              <h3 class="module-title-text">数据挖掘算法应用</h3>
+            </div>
+          </div>
+          <div class="module-meta">
+            <span class="meta-tag">高级</span>
+            <span class="meta-tag">3周</span>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📖 学习方法</div>
+          <p class="method-text">数据挖掘是从大量数据中发现隐藏模式的过程。学习方法：先理解"挖掘什么"（分类/聚类/关联/回归），再学具体算法。每个算法都按"生活类比→数学原理→代码实现→实际应用"四步学习。比如 K-Means 聚类就像"把一堆水果按颜色和大小自动分组"。</p>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">📝 教程步骤</div>
+          <div class="steps-list">
+            
+              <div class="learn-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                  <h5 class="step-title">聚类分析</h5>
+                  <p class="step-desc">学习 K-Means 算法：随机选 K 个中心点→分配每个点到最近中心→更新中心→重复。用肘部法则选 K 值。实际应用：客户分群</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                  <h5 class="step-title">关联规则</h5>
+                  <p class="step-desc">学习 Apriori 算法：支持度→置信度→提升度。理解"买啤酒的人也会买尿布"的关联分析思想。实际应用：购物篮分析</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">3</div>
+                <div class="step-content">
+                  <h5 class="step-title">降维分析</h5>
+                  <p class="step-desc">学习 PCA 主成分分析：把高维数据压缩到低维，保留主要信息。理解方差解释率。实际应用：数据可视化、特征压缩</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">4</div>
+                <div class="step-content">
+                  <h5 class="step-title">时间序列分析</h5>
+                  <p class="step-desc">学习移动平均、指数平滑、ARIMA 模型。理解趋势、季节性、残差三要素。实际应用：销量预测</p>
+                </div>
+              </div>
+              <div class="learn-step">
+                <div class="step-num">5</div>
+                <div class="step-content">
+                  <h5 class="step-title">综合实战项目</h5>
+                  <p class="step-desc">用真实数据集完成一个端到端的数据挖掘项目：数据探索→清洗→特征工程→建模→评估→可视化报告</p>
+                </div>
+              </div>
+          </div>
+        </div>
+
+        <div class="module-section">
+          <div class="section-label">💪 练习题</div>
+          <div class="exercises-list">
+            
+              <div class="exercise-item">
+                <span class="exercise-num">练习 1</span>
+                <p class="exercise-text">用 K-Means 对客户消费数据进行聚类，分成 3-5 个客户群体，分析每个群体的特征</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 2</span>
+                <p class="exercise-text">用 Apriori 算法分析超市购物篮数据，找出支持度 > 5% 且置信度 > 60% 的关联规则</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 3</span>
+                <p class="exercise-text">对高维数据集进行 PCA 降维，画出前两个主成分的散点图，观察数据分布</p>
+              </div>
+              <div class="exercise-item">
+                <span class="exercise-num">练习 4</span>
+                <p class="exercise-text">对一组月度销售数据进行 ARIMA 建模，预测未来 6 个月的销售额</p>
+              </div>
+          </div>
+        </div>
+      </div>
 
     <div style="text-align:center;" class="fade-in">
       <a href="skills.html" class="camp-back">
@@ -1539,5 +1887,7 @@ document.querySelectorAll('.hobby-card').forEach(card => {
   });
 })();
 </script>
+</body>
+</html>
 </body>
 </html>
