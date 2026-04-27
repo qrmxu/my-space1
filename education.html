@@ -1702,26 +1702,36 @@ document.querySelectorAll('.hobby-card').forEach(card => {
       fetch(href)
         .then(function(res) { return res.text(); })
         .then(function(html) {
-          // 提取目标页面的 #main-content 内容
           var parser = new DOMParser();
           var doc = parser.parseFromString(html, 'text/html');
+
+          // 提取目标页面的所有 <style> 并动态注入
+          var styles = doc.querySelectorAll('style');
+          var cssText = '';
+          styles.forEach(function(s) { cssText += s.textContent + '\n'; });
+          if (cssText) {
+            var ds = document.getElementById('spa-dynamic-style');
+            if (ds) { ds.textContent = cssText; }
+            else {
+              ds = document.createElement('style');
+              ds.id = 'spa-dynamic-style';
+              ds.textContent = cssText;
+              document.head.appendChild(ds);
+            }
+          }
+
+          // 提取目标页面的 #main-content 内容
           var newContent = doc.getElementById('main-content');
           if (newContent) {
             mainContent.innerHTML = newContent.innerHTML;
-            // 更新URL（不刷新页面）
             history.pushState(null, '', href);
-            // 更新导航高亮
             updateNav(href);
-            // 重新初始化动画观察器
             initAnimations();
-            // 滚动到顶部
             window.scrollTo(0, 0);
           }
-          // 淡入新内容
           mainContent.classList.remove('fade-out');
         })
         .catch(function() {
-          // fetch失败时回退到普通跳转
           window.location.href = href;
         });
     }, 250);

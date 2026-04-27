@@ -1359,6 +1359,8 @@ document.querySelectorAll('.hobby-card').forEach(card => {
 (function() {
   var mainContent = document.getElementById('main-content');
   if (!mainContent) return;
+  // 用于存储动态注入的style标签
+  var dynamicStyle = null;
 
   // 拦截所有内部链接
   document.addEventListener('click', function(e) {
@@ -1379,26 +1381,37 @@ document.querySelectorAll('.hobby-card').forEach(card => {
       fetch(href)
         .then(function(res) { return res.text(); })
         .then(function(html) {
-          // 提取目标页面的 #main-content 内容
           var parser = new DOMParser();
           var doc = parser.parseFromString(html, 'text/html');
+
+          // 提取目标页面的所有 <style> 内容并注入
+          var styles = doc.querySelectorAll('style');
+          var cssText = '';
+          styles.forEach(function(s) { cssText += s.textContent + '
+'; });
+          if (cssText) {
+            if (dynamicStyle) {
+              dynamicStyle.textContent = cssText;
+            } else {
+              dynamicStyle = document.createElement('style');
+              dynamicStyle.id = 'spa-dynamic-style';
+              dynamicStyle.textContent = cssText;
+              document.head.appendChild(dynamicStyle);
+            }
+          }
+
+          // 提取目标页面的 #main-content 内容
           var newContent = doc.getElementById('main-content');
           if (newContent) {
             mainContent.innerHTML = newContent.innerHTML;
-            // 更新URL（不刷新页面）
             history.pushState(null, '', href);
-            // 更新导航高亮
             updateNav(href);
-            // 重新初始化动画观察器
             initAnimations();
-            // 滚动到顶部
             window.scrollTo(0, 0);
           }
-          // 淡入新内容
           mainContent.classList.remove('fade-out');
         })
         .catch(function() {
-          // fetch失败时回退到普通跳转
           window.location.href = href;
         });
     }, 250);
