@@ -4,1890 +4,844 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>数据分析技术训练营 | 徐梓豪</title>
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>数据分析技术训练营 | 徐梓豪</title>
 <style>
-/* ========== CSS 变量 & 全局重置 ========== */
-:root {
-  --bg-primary: #0a0a0f;
-  --bg-secondary: #0d0d1a;
-  --bg-card: rgba(13, 17, 35, 0.6);
-  --neon-cyan: #00f0ff;
-  --neon-purple: #b44aff;
-  --neon-blue: #4a6aff;
-  --neon-pink: #ff4a8d;
-  --text-primary: #e8eaf6;
-  --text-secondary: #8892b0;
-  --glass-border: rgba(0, 240, 255, 0.12);
-  --glass-bg: rgba(10, 15, 30, 0.55);
-  --glow-cyan: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 60px rgba(0, 240, 255, 0.1);
-  --glow-purple: 0 0 20px rgba(180, 74, 255, 0.3), 0 0 60px rgba(180, 74, 255, 0.1);
-}
-
-*, *::before, *::after {
-  margin: 0; padding: 0; box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-  scrollbar-width: thin;
-  scrollbar-color: var(--neon-cyan) var(--bg-primary);
-}
-
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--neon-cyan); border-radius: 3px; }
-
-body {
-  font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  overflow-x: hidden;
-  line-height: 1.7;
-}
-
-/* ========== 粒子画布 ========== */
-#particles-canvas {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* ========== 扫描线叠加 ========== */
-.scanlines {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 1;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 240, 255, 0.008) 2px,
-    rgba(0, 240, 255, 0.008) 4px
-  );
-}
-
-/* ========== 导航栏 ========== */
-.navbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: blur(20px);
-  background: rgba(10, 10, 15, 0.7);
-  border-bottom: 1px solid var(--glass-border);
-  transition: all 0.4s ease;
-}
-
-.navbar.scrolled {
-  padding: 0.6rem 2rem;
-  background: rgba(10, 10, 15, 0.9);
-  box-shadow: var(--glow-cyan);
-}
-
-.nav-logo {
-  font-size: 1.4rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-.nav-links {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-}
-
-.nav-links a {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  position: relative;
-  transition: color 0.3s;
-}
-
-.nav-links a::after {
-  content: '';
-  position: absolute;
-  bottom: -4px; left: 0;
-  width: 0; height: 2px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
-  transition: width 0.3s;
-  box-shadow: 0 0 8px var(--neon-cyan);
-}
-
-.nav-links a:hover { color: var(--neon-cyan); }
-.nav-links a:hover::after { width: 100%; }
-
-/* ========== 通用容器 ========== */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  position: relative;
-  z-index: 2;
-}
-
-section {
-  padding: 100px 0;
-  position: relative;
-}
-
-/* ========== 区域标题 ========== */
-.section-header {
-  text-align: center;
-  margin-bottom: 4rem;
-}
-
-.section-tag {
-  display: inline-block;
-  font-size: 0.8rem;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--neon-cyan);
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  padding: 0.3rem 1.2rem;
-  border-radius: 20px;
-  margin-bottom: 1rem;
-  animation: tagPulse 3s ease-in-out infinite;
-}
-
-@keyframes tagPulse {
-  0%, 100% { box-shadow: 0 0 5px rgba(0, 240, 255, 0.1); }
-  50% { box-shadow: 0 0 20px rgba(0, 240, 255, 0.3); }
-}
-
-.section-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 0.5rem;
-}
-
-.section-line {
-  width: 60px; height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
-  margin: 1rem auto 0;
-  border-radius: 2px;
-  box-shadow: 0 0 10px var(--neon-cyan);
-}
-
-/* ========== Hero 区域 ========== */
-.hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-
-.hero-content { position: relative; z-index: 2; }
-
-.hero-greeting {
-  font-size: 1.1rem;
-  color: var(--neon-cyan);
-  letter-spacing: 6px;
-  text-transform: uppercase;
-  margin-bottom: 1rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.3s;
-}
-
-.hero-name {
-  font-size: 4rem;
-  font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.6s;
-}
-
-.hero-name .gradient-text {
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  background-size: 200% 200%;
-  animation: gradientShift 4s ease infinite;
-}
-
-@keyframes gradientShift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-}
-
-.hero-subtitle {
-  font-size: 1.3rem;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 0.9s;
-}
-
-.hero-typing {
-  font-size: 1.1rem;
-  color: var(--neon-purple);
-  margin-bottom: 2rem;
-  min-height: 1.8rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 1.2s;
-}
-
-.hero-typing .cursor {
-  display: inline-block;
-  width: 2px; height: 1.2em;
-  background: var(--neon-cyan);
-  margin-left: 2px;
-  vertical-align: text-bottom;
-  animation: blink 1s step-end infinite;
-}
-
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.hero-cta {
-  display: inline-flex;
-  gap: 1rem;
-  opacity: 0;
-  animation: fadeInUp 0.8s ease forwards 1.5s;
-}
-
-.btn {
-  padding: 0.8rem 2rem;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  letter-spacing: 1px;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s;
-  position: relative;
-  overflow: hidden;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--neon-cyan), var(--neon-blue));
-  color: var(--bg-primary);
-  font-weight: 600;
-  border: none;
-}
-
-.btn-primary:hover {
-  box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
-  transform: translateY(-2px);
-}
-
-.btn-outline {
-  background: transparent;
-  color: var(--neon-cyan);
-  border: 1px solid var(--neon-cyan);
-}
-
-.btn-outline:hover {
-  background: rgba(0, 240, 255, 0.1);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-/* Hero 装饰圆环 */
-.hero-ring {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(0, 240, 255, 0.08);
-  animation: ringRotate 20s linear infinite;
-}
-
-.hero-ring:nth-child(1) { width: 500px; height: 500px; }
-.hero-ring:nth-child(2) { width: 700px; height: 700px; animation-duration: 30s; animation-direction: reverse; }
-.hero-ring:nth-child(3) { width: 900px; height: 900px; animation-duration: 40s; }
-
-@keyframes ringRotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ========== 关于区域 ========== */
-.about-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-}
-
-.about-avatar {
-  position: relative;
-  display: flex;
-  justify-content: center;
-}
-
-.avatar-frame {
-  width: 280px; height: 280px;
-  border-radius: 20px;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.1), rgba(180, 74, 255, 0.1));
-  border: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(10px);
-}
-
-.avatar-frame::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border-radius: 22px;
-  background: conic-gradient(from 0deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink), var(--neon-cyan));
-  z-index: -1;
-  animation: borderRotate 6s linear infinite;
-  opacity: 0.5;
-}
-
-@keyframes borderRotate {
-  from { filter: hue-rotate(0deg); }
-  to { filter: hue-rotate(360deg); }
-}
-
-.avatar-icon {
-  font-size: 6rem;
-  opacity: 0.8;
-}
-
-.avatar-stats {
-  position: absolute;
-  bottom: -20px; right: -20px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  display: flex;
-  gap: 1.5rem;
-}
-
-.stat-item { text-align: center; }
-.stat-num {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--neon-cyan);
-}
-.stat-label {
-  font-size: 0.7rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.about-text h3 {
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
-  color: var(--text-primary);
-}
-
-.about-text p {
-  color: var(--text-secondary);
-  margin-bottom: 1rem;
-  font-size: 1rem;
-}
-
-.about-text .highlight {
-  color: var(--neon-cyan);
-  font-weight: 500;
-}
-
-.about-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.about-tag {
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  border: 1px solid rgba(0, 240, 255, 0.2);
-  color: var(--neon-cyan);
-  background: rgba(0, 240, 255, 0.05);
-  transition: all 0.3s;
-}
-
-.about-tag:hover {
-  background: rgba(0, 240, 255, 0.15);
-  box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-/* ========== 教育区域 ========== */
-.education-card {
-  max-width: 800px;
-  margin: 0 auto;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: 3rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.education-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
-}
-
-.education-card .holo-badge {
-  position: absolute;
-  top: 1.5rem; right: 1.5rem;
-  padding: 0.3rem 1rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.15), rgba(180, 74, 255, 0.15));
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  color: var(--neon-cyan);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  animation: holoShimmer 3s ease-in-out infinite;
-}
-
-@keyframes holoShimmer {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
-}
-
-.edu-school {
-  font-size: 1.6rem;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-  background: linear-gradient(135deg, var(--text-primary), var(--neon-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.edu-college {
-  font-size: 1.1rem;
-  color: var(--neon-purple);
-  margin-bottom: 0.5rem;
-}
-
-.edu-major {
-  font-size: 1.3rem;
-  color: var(--text-primary);
-  margin-bottom: 1.5rem;
-}
-
-.edu-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
-.edu-detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.edu-detail-icon {
-  width: 40px; height: 40px;
-  border-radius: 10px;
-  background: rgba(0, 240, 255, 0.08);
-  border: 1px solid rgba(0, 240, 255, 0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  flex-shrink: 0;
-}
-
-.edu-detail-text .label {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.edu-detail-text .value {
-  font-size: 0.95rem;
-  color: var(--text-primary);
-}
-
-/* ========== 技能区域 ========== */
-.skills-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-}
-
-.skill-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: all 0.4s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.skill-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: linear-gradient(135deg, rgba(0, 240, 255, 0.03), rgba(180, 74, 255, 0.03));
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.skill-card:hover::before { opacity: 1; }
-
-.skill-card:hover {
-  border-color: rgba(0, 240, 255, 0.3);
-  transform: translateY(-4px);
-  box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
-}
-
-.skill-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.8rem;
-}
-
-.skill-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.skill-icon {
-  font-size: 1.3rem;
-}
-
-.skill-percent {
-  font-size: 0.85rem;
-  color: var(--neon-cyan);
-  font-weight: 600;
-}
-
-.skill-bar {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 2px;
-  overflow: hidden;
-  margin-bottom: 0.6rem;
-}
-
-.skill-progress {
-  height: 100%;
-  border-radius: 2px;
-  width: 0;
-  transition: width 1.5s ease;
-  position: relative;
-}
-
-.skill-progress.cyan { background: linear-gradient(90deg, var(--neon-cyan), rgba(0, 240, 255, 0.5)); box-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
-.skill-progress.purple { background: linear-gradient(90deg, var(--neon-purple), rgba(180, 74, 255, 0.5)); box-shadow: 0 0 10px rgba(180, 74, 255, 0.4); }
-.skill-progress.blue { background: linear-gradient(90deg, var(--neon-blue), rgba(74, 106, 255, 0.5)); box-shadow: 0 0 10px rgba(74, 106, 255, 0.4); }
-.skill-progress.pink { background: linear-gradient(90deg, var(--neon-pink), rgba(255, 74, 141, 0.5)); box-shadow: 0 0 10px rgba(255, 74, 141, 0.4); }
-
-.skill-desc {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.6rem;
-  flex-wrap: wrap;
-}
-
-.skill-desc svg {
-  width: 18px; height: 18px;
-  opacity: 0.6;
-  transition: opacity 0.3s, transform 0.3s;
-}
-
-.skill-desc svg:hover {
-  opacity: 1;
-  transform: scale(1.2);
-}
-/* 训练营按钮 */
-.skill-card-footer {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 0.8rem;
-}
-
-.camp-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 1rem;
-  border-radius: 6px;
-  font-size: 0.78rem;
-  font-weight: 500;
-  color: #fff;
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(139, 92, 246, 0.25));
-  border: 1px solid rgba(96, 165, 250, 0.3);
-  text-decoration: none;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.camp-btn::before {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%; right: 0; bottom: 0;
-  width: 300%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-  transition: left 0.5s;
-}
-
-.camp-btn:hover::before {
-  left: 100%;
-}
-
-.camp-btn:hover {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4));
-  border-color: rgba(96, 165, 250, 0.5);
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
-  transform: translateY(-1px);
-}
-
-.camp-btn svg {
-  width: 14px; height: 14px;
-  opacity: 0.9;
-}
-
-
-/* ========== 爱好区域 ========== */
-.hobbies-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
-.hobby-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  padding: 2rem 1.5rem;
-  text-align: center;
-  transition: all 0.4s ease;
-  cursor: default;
-  position: relative;
-  overflow: hidden;
-}
-
-.hobby-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(0, 240, 255, 0.08), transparent 60%);
-  opacity: 0;
-  transition: opacity 0.4s;
-}
-
-.hobby-card:hover::after { opacity: 1; }
-
-.hobby-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  border-color: rgba(0, 240, 255, 0.3);
-  box-shadow: 0 20px 60px rgba(0, 240, 255, 0.1);
-}
-
-.hobby-icon {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-  display: block;
-  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
-  transition: transform 0.4s;
-}
-
-.hobby-card:hover .hobby-icon {
-  transform: scale(1.15) rotate(5deg);
-}
-
-.hobby-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 0.3rem;
-}
-
-.hobby-desc {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-/* ========== 时间线（未来愿景） ========== */
-.timeline {
-  max-width: 700px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 0; bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--neon-cyan), var(--neon-purple), transparent);
-  transform: translateX(-50%);
-}
-
-.timeline-item {
-  display: flex;
-  align-items: flex-start;
-  margin-bottom: 3rem;
-  position: relative;
-}
-
-.timeline-item:nth-child(odd) { flex-direction: row-reverse; }
-
-.timeline-dot {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: var(--neon-cyan);
-  transform: translateX(-50%);
-  box-shadow: 0 0 15px var(--neon-cyan);
-  z-index: 1;
-}
-
-.timeline-content {
-  width: 45%;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 1.5rem;
-  transition: all 0.3s;
-}
-
-.timeline-content:hover {
-  border-color: rgba(0, 240, 255, 0.3);
-  box-shadow: var(--glow-cyan);
-}
-
-.timeline-year {
-  font-size: 0.8rem;
-  color: var(--neon-cyan);
-  letter-spacing: 2px;
-  margin-bottom: 0.3rem;
-}
-
-.timeline-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-bottom: 0.3rem;
-}
-
-.timeline-desc {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-/* ========== 页脚 ========== */
-.footer {
-  padding: 3rem 0;
-  border-top: 1px solid var(--glass-border);
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-.footer-text {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.footer-text .heart {
-  color: var(--neon-pink);
-  animation: heartbeat 1.5s ease infinite;
-}
-
-@keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem;
-}
-
-.footer-link {
-  color: var(--text-secondary);
-  text-decoration: none;
-  font-size: 0.85rem;
-  transition: color 0.3s;
-}
-
-.footer-link:hover { color: var(--neon-cyan); }
-
-/* ========== 动画 ========== */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s ease;
-}
-
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ========== 故障效果 ========== */
-.glitch {
-  position: relative;
-}
-
-.glitch::before, .glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-}
-
-.glitch::before {
-  animation: glitch1 3s infinite;
-  color: var(--neon-cyan);
-  z-index: -1;
-}
-
-.glitch::after {
-  animation: glitch2 3s infinite;
-  color: var(--neon-pink);
-  z-index: -2;
-}
-
-@keyframes glitch1 {
-  0%, 94%, 100% { transform: translate(0); }
-  95% { transform: translate(-3px, 2px); }
-  96% { transform: translate(3px, -2px); }
-}
-
-@keyframes glitch2 {
-  0%, 94%, 100% { transform: translate(0); }
-  95% { transform: translate(3px, -2px); }
-  96% { transform: translate(-3px, 2px); }
-}
-
-/* ========== 浮动装饰 ========== */
-.float-decoration {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.15;
-  pointer-events: none;
-}
-
-/* ========== 响应式 ========== */
-@media (max-width: 768px) {
-  .hero-name { font-size: 2.5rem; }
-  .about-grid { grid-template-columns: 1fr; gap: 2rem; }
-  .nav-links { display: none; }
-  .section-title { font-size: 2rem; }
-  .skills-grid { grid-template-columns: 1fr; }
-  .hobbies-grid { grid-template-columns: repeat(2, 1fr); }
-  .timeline::before { left: 20px; }
-  .timeline-item, .timeline-item:nth-child(odd) { flex-direction: row; padding-left: 50px; }
-  .timeline-dot { left: 20px; }
-  .timeline-content { width: 100%; }
-  .education-card { padding: 2rem; }
-  .edu-details { grid-template-columns: 1fr; }
-}
-
-/* ========== 页面过渡动画 ========== */
-.page-transition {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: var(--bg-primary);
-  z-index: 9999;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-.page-transition.active {
-  opacity: 1;
-  pointer-events: all;
-}
-
-/* ========== SPA页面过渡 ========== */
-#main-content {
-  transition: opacity 0.25s ease;
-}
-#main-content.fade-out {
-  opacity: 0;
-}
-</style>
-
-/* ========== 训练营增强版 ========== */
-.container { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
-.camp-hero { text-align: center; padding: 2rem 0 1rem; }
-.camp-hero-icon { font-size: 3rem; margin-bottom: 0.8rem; display: inline-block; animation: campFloat 3s ease-in-out infinite; }
-@keyframes campFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-.camp-hero h2 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0 0 0.4rem; }
-.camp-hero p { color: #94a3b8; font-size: 0.9rem; margin: 0; }
-
-.camp-stats { display: flex; justify-content: center; gap: 2.5rem; margin: 1.5rem 0; padding: 1.2rem; background: rgba(30,41,59,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-.camp-stat { text-align: center; }
-.camp-stat-num { font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.camp-stat-label { font-size: 0.75rem; color: #64748b; margin-top: 0.2rem; }
-
-.module-card { background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem; transition: all 0.3s; position: relative; overflow: hidden; }
-.module-card::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px; background: linear-gradient(to bottom, #ec4899, #f59e0b); opacity: 0.5; }
-.module-card:hover { border-color: rgba(255,255,255,0.1); background: rgba(30,41,59,0.55); }
-
-.module-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem; }
-.module-header-left { display: flex; align-items: center; gap: 0.75rem; }
-.module-icon { font-size: 1.5rem; }
-.module-number { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 1px; }
-.module-title-text { font-size: 1.1rem; font-weight: 600; color: #E2E8F0; margin: 0.15rem 0 0; }
-.module-meta { display: flex; gap: 0.5rem; }
-.meta-tag { font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 12px; background: rgba(236,72,153,0.12); color: #F472B6; border: 1px solid rgba(236,72,153,0.2); }
-
-.module-section { margin-bottom: 1.25rem; }
-.module-section:last-child { margin-bottom: 0; }
-.section-label { font-size: 0.8rem; font-weight: 600; color: #A78BFA; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.4rem; }
-
-.method-text { font-size: 0.88rem; color: #cbd5e1; line-height: 1.8; margin: 0; padding: 1rem 1.25rem; background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.1); border-radius: 10px; }
-
-.steps-list { display: flex; flex-direction: column; gap: 0.6rem; }
-.learn-step { display: flex; gap: 0.75rem; align-items: flex-start; }
-.step-num { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, rgba(236,72,153,0.2), rgba(245,158,11,0.2)); border: 1px solid rgba(236,72,153,0.3); color: #F472B6; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 0.1rem; }
-.step-content { flex: 1; }
-.step-title { font-size: 0.88rem; font-weight: 600; color: #E2E8F0; margin: 0 0 0.2rem; }
-.step-desc { font-size: 0.82rem; color: #94a3b8; line-height: 1.6; margin: 0; }
-
-.exercises-list { display: flex; flex-direction: column; gap: 0.5rem; }
-.exercise-item { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.6rem 0.8rem; background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.08); border-radius: 8px; }
-.exercise-num { font-size: 0.7rem; font-weight: 600; color: #FBBF24; background: rgba(245,158,11,0.12); padding: 0.15rem 0.5rem; border-radius: 4px; white-space: nowrap; flex-shrink: 0; margin-top: 0.05rem; }
-.exercise-text { font-size: 0.82rem; color: #cbd5e1; line-height: 1.6; margin: 0; }
-
-.camp-back { display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; padding: 0.6rem 1.5rem; border-radius: 8px; font-size: 0.85rem; color: #94a3b8; background: rgba(30,41,59,0.4); border: 1px solid rgba(255,255,255,0.08); text-decoration: none; transition: all 0.3s; }
-.camp-back:hover { color: #fff; background: rgba(30,41,59,0.6); border-color: rgba(255,255,255,0.15); }
-.camp-back svg { width: 16px; height: 16px; }
-
+:root{--bg-primary:#0a0a0f;--bg-secondary:#0d0d1a;--bg-card:rgba(13,17,35,0.6);--neon-cyan:#00f0ff;--neon-purple:#b44aff;--neon-blue:#4a6aff;--neon-pink:#ff4a8d;--text-primary:#e8eaf6;--text-secondary:#8892b0;--glass-border:rgba(0,240,255,0.12);--glass-bg:rgba(10,15,30,0.55);--glow-cyan:0 0 20px rgba(0,240,255,0.3),0 0 60px rgba(0,240,255,0.1);--glow-purple:0 0 20px rgba(180,74,255,0.3),0 0 60px rgba(180,74,255,0.1);--sidebar-width:280px;--navbar-height:60px}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--neon-cyan) var(--bg-primary)}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg-primary)}::-webkit-scrollbar-thumb{background:var(--neon-cyan);border-radius:3px}
+body{font-family:'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;background:var(--bg-primary);color:var(--text-primary);overflow-x:hidden;line-height:1.7}
+#particles-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.scanlines{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,240,255,0.008) 2px,rgba(0,240,255,0.008) 4px)}
+.navbar{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(20px);background:rgba(10,10,15,0.7);border-bottom:1px solid var(--glass-border);transition:all .4s ease}
+.navbar.scrolled{padding:.6rem 2rem;background:rgba(10,10,15,0.9);box-shadow:var(--glow-cyan)}
+.nav-logo{font-size:1.4rem;font-weight:700;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:2px;text-transform:uppercase}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;letter-spacing:1px;text-transform:uppercase;position:relative;transition:color .3s}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:2px;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));transition:width .3s;box-shadow:0 0 8px var(--neon-cyan)}
+.nav-links a:hover{color:var(--neon-cyan)}.nav-links a:hover::after{width:100%}
+.sidebar{position:fixed;top:var(--navbar-height);left:0;width:var(--sidebar-width);height:calc(100vh - var(--navbar-height));background:rgba(10,12,25,0.95);backdrop-filter:blur(20px);border-right:1px solid var(--glass-border);z-index:50;overflow-y:auto;transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+.sidebar.collapsed{transform:translateX(calc(-1 * var(--sidebar-width)))}
+.sidebar-toggle{position:fixed;top:calc(var(--navbar-height) + 12px);left:var(--sidebar-width);z-index:51;width:32px;height:32px;border-radius:0 6px 6px 0;background:rgba(10,12,25,0.95);border:1px solid var(--glass-border);border-left:none;color:var(--neon-cyan);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:left .35s cubic-bezier(.4,0,.2,1),background .3s}
+.sidebar.collapsed~.sidebar-toggle{left:0}
+.sidebar-toggle:hover{background:rgba(0,240,255,0.1)}
+.sidebar-header{padding:1.2rem 1.2rem .8rem;border-bottom:1px solid var(--glass-border);flex-shrink:0}
+.sidebar-title{font-size:.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--neon-cyan);font-weight:600}
+.sidebar-progress{margin-top:.6rem;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;overflow:hidden}
+.sidebar-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));border-radius:2px;transition:width .5s ease}
+.sidebar-progress-text{font-size:.7rem;color:var(--text-secondary);margin-top:.3rem}
+.sidebar-nav{flex:1;padding:.6rem 0;overflow-y:auto}
+.sidebar-item{display:flex;align-items:center;gap:.7rem;padding:.7rem 1.2rem;cursor:pointer;transition:all .25s;text-decoration:none;color:var(--text-secondary);border-left:3px solid transparent}
+.sidebar-item:hover{background:rgba(0,240,255,0.04);color:var(--text-primary)}
+.sidebar-item.active{background:rgba(0,240,255,0.08);color:var(--neon-cyan);border-left-color:var(--neon-cyan)}
+.sidebar-num{width:24px;height:24px;border-radius:6px;background:rgba(0,240,255,0.08);border:1px solid rgba(0,240,255,0.2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--neon-cyan);flex-shrink:0}
+.sidebar-item.active .sidebar-num{background:var(--neon-cyan);color:var(--bg-primary)}
+.sidebar-item-text{flex:1;min-width:0}
+.sidebar-item-title{font-size:.82rem;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sidebar-item-meta{font-size:.65rem;color:var(--text-secondary);opacity:.7}
+.sidebar-status{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;transition:all .3s}
+.sidebar-item.completed .sidebar-status{background:var(--neon-cyan);color:var(--bg-primary)}
+.main-content{margin-left:var(--sidebar-width);padding-top:var(--navbar-height);transition:margin-left .35s cubic-bezier(.4,0,.2,1);position:relative;z-index:2}
+.sidebar.collapsed~.main-content{margin-left:0}
+.content-wrapper{max-width:900px;margin:0 auto;padding:2rem 2.5rem 4rem}
+.camp-hero{text-align:center;padding:2rem 0 1.5rem}
+.camp-hero-icon{font-size:3rem;margin-bottom:.8rem;display:inline-block;animation:campFloat 3s ease-in-out infinite}
+@keyframes campFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.camp-hero h1{font-size:2.2rem;font-weight:800;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple),var(--neon-pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.5rem}
+.camp-hero p{color:var(--text-secondary);font-size:1rem;margin-bottom:.3rem}
+.camp-stats{display:flex;justify-content:center;gap:2.5rem;margin:1.5rem 0;padding:1.2rem;background:var(--glass-bg);border-radius:12px;border:1px solid var(--glass-border);backdrop-filter:blur(20px)}
+.camp-stat{text-align:center}
+.camp-stat-num{font-size:1.5rem;font-weight:700;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.camp-stat-label{font-size:.75rem;color:var(--text-secondary);margin-top:.2rem}
+.chapter{margin-bottom:3rem;scroll-margin-top:calc(var(--navbar-height) + 20px)}
+.chapter-header{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:2px solid transparent;border-image:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple),transparent) 1}
+.chapter-icon{font-size:2rem;flex-shrink:0}
+.chapter-info{flex:1}
+.chapter-label{font-size:.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--neon-cyan);font-weight:600}
+.chapter-title{font-size:1.6rem;font-weight:700;color:var(--text-primary);margin-top:.2rem}
+.chapter-tags{display:flex;gap:.5rem;flex-shrink:0}
+.chapter-tag{font-size:.7rem;padding:.2rem .7rem;border-radius:12px;border:1px solid rgba(0,240,255,0.2);color:var(--neon-cyan);background:rgba(0,240,255,0.05)}
+.chapter-tag.purple{border-color:rgba(180,74,255,0.3);color:var(--neon-purple);background:rgba(180,74,255,0.08)}
+.chapter-tag.pink{border-color:rgba(255,74,141,0.3);color:var(--neon-pink);background:rgba(255,74,141,0.08)}
+.chapter-section{margin-bottom:2rem;background:var(--glass-bg);backdrop-filter:blur(20px);border:1px solid var(--glass-border);border-radius:14px;overflow:hidden}
+.section-title-bar{display:flex;align-items:center;gap:.6rem;padding:1rem 1.5rem;background:rgba(0,240,255,0.03);border-bottom:1px solid var(--glass-border);cursor:pointer;user-select:none;transition:background .3s}
+.section-title-bar:hover{background:rgba(0,240,255,0.06)}
+.section-title-bar .icon{font-size:1.1rem}
+.section-title-bar .title{font-size:.95rem;font-weight:600;color:var(--text-primary);flex:1}
+.section-title-bar .arrow{color:var(--text-secondary);font-size:.7rem;transition:transform .3s}
+.section-title-bar.open .arrow{transform:rotate(180deg)}
+.section-body{padding:1.5rem;display:none}
+.section-body.open{display:block}
+.video-placeholder{width:100%;aspect-ratio:16/9;background:rgba(13,17,35,0.8);border:1px solid var(--glass-border);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-secondary);gap:.8rem}
+.video-placeholder .play-icon{width:60px;height:60px;border-radius:50%;background:rgba(0,240,255,0.1);border:2px solid var(--neon-cyan);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--neon-cyan)}
+.video-placeholder .text{font-size:.85rem}
+.video-placeholder .hint{font-size:.72rem;opacity:.5}
+.tutorial-content h4{font-size:1.05rem;font-weight:600;color:var(--neon-cyan);margin-bottom:.6rem;margin-top:1.2rem}
+.tutorial-content h4:first-child{margin-top:0}
+.tutorial-content p{font-size:.9rem;color:var(--text-secondary);line-height:1.8;margin-bottom:.8rem}
+.tutorial-content strong{color:var(--text-primary)}
+.tutorial-content code{background:rgba(0,240,255,0.08);color:var(--neon-cyan);padding:.15rem .4rem;border-radius:4px;font-family:'Fira Code','Consolas',monospace;font-size:.84rem}
+.code-block{position:relative;margin:1rem 0;border-radius:10px;overflow:hidden;border:1px solid var(--glass-border)}
+.code-block-header{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1rem;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--glass-border)}
+.code-block-lang{font-size:.72rem;color:var(--neon-cyan);letter-spacing:1px;text-transform:uppercase;font-weight:600}
+.code-block-copy{font-size:.72rem;color:var(--text-secondary);background:none;border:1px solid rgba(255,255,255,0.1);border-radius:4px;padding:.2rem .6rem;cursor:pointer;transition:all .3s}
+.code-block-copy:hover{color:var(--neon-cyan);border-color:var(--neon-cyan)}
+.code-block pre{background:#1a1a2e;padding:1rem 1.2rem;overflow-x:auto;font-family:'Fira Code','Consolas','Monaco',monospace;font-size:.84rem;line-height:1.7;color:#e8eaf6;tab-size:4;margin:0}
+.code-block .kw{color:#c792ea}.code-block .fn{color:#82aaff}.code-block .str{color:#c3e88d}.code-block .num{color:#f78c6c}.code-block .cm{color:#546e7a;font-style:italic}.code-block .op{color:#89ddff}.code-block .var{color:#f07178}.code-block .cls{color:#ffcb6b}.code-block .bi{color:#82aaff}
+.explain-card{background:rgba(180,74,255,0.06);border:1px solid rgba(180,74,255,0.15);border-radius:10px;padding:1.2rem 1.5rem;margin:1rem 0}
+.explain-card .label{font-size:.8rem;font-weight:600;color:var(--neon-purple);margin-bottom:.5rem;display:flex;align-items:center;gap:.4rem}
+.explain-card p{font-size:.88rem;color:var(--text-secondary);line-height:1.8;margin:0}
+.explain-card .hl{color:var(--neon-cyan);font-weight:500}
+.code-editor-wrapper{margin:1rem 0;border-radius:10px;overflow:hidden;border:1px solid var(--glass-border)}
+.code-editor-toolbar{display:flex;justify-content:space-between;align-items:center;padding:.5rem 1rem;background:rgba(0,0,0,0.4);border-bottom:1px solid var(--glass-border)}
+.code-editor-toolbar .label{font-size:.75rem;color:var(--neon-cyan);font-weight:600;letter-spacing:1px}
+.code-editor-actions{display:flex;gap:.5rem;align-items:center}
+.btn-run{display:inline-flex;align-items:center;gap:.4rem;padding:.35rem 1rem;border-radius:6px;font-size:.78rem;font-weight:600;color:var(--bg-primary);background:linear-gradient(135deg,var(--neon-cyan),var(--neon-blue));border:none;cursor:pointer;transition:all .3s}
+.btn-run:hover{box-shadow:0 0 20px rgba(0,240,255,0.4);transform:translateY(-1px)}
+.btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-run .spinner{display:none;width:12px;height:12px;border:2px solid rgba(0,0,0,0.2);border-top-color:var(--bg-primary);border-radius:50%;animation:spin .6s linear infinite}
+.btn-run.loading .spinner{display:inline-block}.btn-run.loading .run-text{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.btn-reset{padding:.35rem .7rem;border-radius:6px;font-size:.75rem;color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .3s}
+.btn-reset:hover{color:var(--text-primary);border-color:rgba(255,255,255,0.2)}
+.code-textarea{width:100%;min-height:200px;background:#1a1a2e;color:#e8eaf6;border:none;padding:1rem 1.2rem;font-family:'Fira Code','Consolas','Monaco',monospace;font-size:.84rem;line-height:1.7;tab-size:4;resize:vertical;outline:none}
+.code-output{border-top:1px solid var(--glass-border);background:rgba(0,0,0,0.3);padding:0;max-height:300px;overflow-y:auto;display:none}
+.code-output.visible{display:block;padding:1rem 1.2rem}
+.code-output-header{font-size:.72rem;color:var(--text-secondary);letter-spacing:1px;text-transform:uppercase;margin-bottom:.5rem;padding-bottom:.4rem;border-bottom:1px solid rgba(255,255,255,0.05)}
+.code-output pre{font-family:'Fira Code','Consolas','Monaco',monospace;font-size:.82rem;line-height:1.6;color:#c3e88d;white-space:pre-wrap;word-break:break-all;margin:0}
+.code-output.error pre{color:#f07178}
+.pyodide-status{text-align:center;padding:.8rem;font-size:.8rem;color:var(--text-secondary);background:rgba(0,240,255,0.03);border:1px solid var(--glass-border);border-radius:8px;margin-bottom:1rem}
+.pyodide-status .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:.5rem;vertical-align:middle}
+.pyodide-status .status-dot.loading{background:#f59e0b;animation:pulse 1.5s ease-in-out infinite}
+.pyodide-status .status-dot.ready{background:#10b981}
+.pyodide-status .status-dot.error{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.pyodide-progress{width:100%;height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:.5rem;overflow:hidden;display:none}
+.pyodide-progress.active{display:block}
+.pyodide-progress-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--neon-cyan),var(--neon-purple));border-radius:2px;transition:width .3s}
+.quiz-item{margin-bottom:1.2rem;padding:1.2rem;background:rgba(0,240,255,0.02);border:1px solid var(--glass-border);border-radius:10px;transition:border-color .3s}
+.quiz-item:hover{border-color:rgba(0,240,255,0.2)}
+.quiz-question{font-size:.9rem;font-weight:600;color:var(--text-primary);margin-bottom:.8rem;display:flex;gap:.5rem}
+.quiz-question .q-num{color:var(--neon-cyan);flex-shrink:0}
+.quiz-options{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem}
+.quiz-option{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;border-radius:6px;cursor:pointer;transition:all .25s;font-size:.85rem;color:var(--text-secondary);border:1px solid transparent}
+.quiz-option:hover{background:rgba(0,240,255,0.04);border-color:rgba(0,240,255,0.1)}
+.quiz-option.selected{background:rgba(0,240,255,0.08);border-color:rgba(0,240,255,0.2);color:var(--text-primary)}
+.quiz-option.correct{background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.3);color:#10b981}
+.quiz-option.wrong{background:rgba(239,68,68,0.1);border-color:rgba(239,68,68,0.3);color:#ef4444}
+.quiz-option .radio{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .25s}
+.quiz-option.selected .radio{border-color:var(--neon-cyan)}
+.quiz-option.selected .radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--neon-cyan)}
+.quiz-option.correct .radio{border-color:#10b981}
+.quiz-option.correct .radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#10b981}
+.quiz-option.wrong .radio{border-color:#ef4444}
+.quiz-option.wrong .radio::after{content:'';width:8px;height:8px;border-radius:50%;background:#ef4444}
+.quiz-btn{padding:.4rem 1rem;border-radius:6px;font-size:.78rem;font-weight:600;color:var(--bg-primary);background:linear-gradient(135deg,var(--neon-purple),var(--neon-pink));border:none;cursor:pointer;transition:all .3s}
+.quiz-btn:hover{box-shadow:0 0 20px rgba(180,74,255,0.4);transform:translateY(-1px)}
+.quiz-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.quiz-explanation{display:none;margin-top:.8rem;padding:.8rem 1rem;background:rgba(180,74,255,0.06);border:1px solid rgba(180,74,255,0.15);border-radius:8px;font-size:.84rem;color:var(--text-secondary);line-height:1.7}
+.quiz-explanation.visible{display:block}
+.quiz-explanation strong{color:var(--neon-cyan)}
+.footer{padding:3rem 0;border-top:1px solid var(--glass-border);text-align:center;position:relative;z-index:2}
+.footer-text{color:var(--text-secondary);font-size:.9rem}
+.footer-text .heart{color:var(--neon-pink);animation:heartbeat 1.5s ease infinite}
+@keyframes heartbeat{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{opacity:0;transform:translateY(30px);transition:all .8s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.camp-back{display:inline-flex;align-items:center;gap:.5rem;margin-top:1.5rem;padding:.6rem 1.5rem;border-radius:8px;font-size:.85rem;color:var(--text-secondary);background:var(--glass-bg);border:1px solid var(--glass-border);text-decoration:none;transition:all .3s}
+.camp-back:hover{color:var(--text-primary);background:rgba(30,41,59,0.6);border-color:rgba(255,255,255,0.15)}
+.camp-back svg{width:16px;height:16px}
+@media(max-width:1024px){.sidebar{transform:translateX(calc(-1 * var(--sidebar-width)))}.sidebar.mobile-open{transform:translateX(0)}.main-content{margin-left:0!important}.sidebar-toggle{left:0!important}.sidebar.mobile-open~.sidebar-toggle{left:var(--sidebar-width)!important}}
+@media(max-width:768px){.content-wrapper{padding:1.5rem 1rem 3rem}.camp-hero h1{font-size:1.6rem}.camp-stats{flex-wrap:wrap;gap:1.5rem}.chapter-title{font-size:1.3rem}.chapter-tags{display:none}.nav-links{display:none}.code-textarea{min-height:150px;font-size:.78rem}}
+#main-content{transition:opacity .25s ease}
+#main-content.fade-out{opacity:0}
 </style>
 </head>
 <body>
-
 <canvas id="particles-canvas"></canvas>
 <div class="scanlines"></div>
-
 <nav class="navbar" id="navbar">
   <div class="nav-logo"><a href="index.html" style="text-decoration:none;background:linear-gradient(135deg,var(--neon-cyan),var(--neon-purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">&lt;DEV/&gt;</a></div>
-  <ul class="nav-links">
-    <li><a href="index.html">首页</a></li>
-    <li><a href="about.html">关于</a></li>
-    <li><a href="education.html">教育</a></li>
-    <li><a href="skills.html">技能</a></li>
-    <li><a href="hobbies.html">爱好</a></li>
-    <li><a href="vision.html">愿景</a></li>
-  </ul>
+  <ul class="nav-links"><li><a href="index.html">首页</a></li><li><a href="about.html">关于</a></li><li><a href="education.html">教育</a></li><li><a href="skills.html">技能</a></li><li><a href="hobbies.html">爱好</a></li><li><a href="vision.html">愿景</a></li></ul>
 </nav>
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header"><div class="sidebar-title">课程目录</div><div class="sidebar-progress"><div class="sidebar-progress-bar" id="sidebarProgress"></div></div><div class="sidebar-progress-text" id="sidebarProgressText">已完成 0/6 章</div></div>
+  <nav class="sidebar-nav" id="sidebarNav">
+    <a class="sidebar-item" data-chapter="chapter-1" href="#chapter-1"><span class="sidebar-num">01</span><div class="sidebar-item-text"><div class="sidebar-item-title">数据清洗与预处理</div><div class="sidebar-item-meta">入门 · 2周</div></div><span class="sidebar-status">&#10003;</span></a>
+    <a class="sidebar-item" data-chapter="chapter-2" href="#chapter-2"><span class="sidebar-num">02</span><div class="sidebar-item-text"><div class="sidebar-item-title">特征工程实战</div><div class="sidebar-item-meta">进阶 · 2周</div></div><span class="sidebar-status">&#10003;</span></a>
+    <a class="sidebar-item" data-chapter="chapter-3" href="#chapter-3"><span class="sidebar-num">03</span><div class="sidebar-item-text"><div class="sidebar-item-title">数据建模与分析</div><div class="sidebar-item-meta">进阶 · 3周</div></div><span class="sidebar-status">&#10003;</span></a>
+    <a class="sidebar-item" data-chapter="chapter-4" href="#chapter-4"><span class="sidebar-num">04</span><div class="sidebar-item-text"><div class="sidebar-item-title">SQL 高级查询技巧</div><div class="sidebar-item-meta">入门 · 2周</div></div><span class="sidebar-status">&#10003;</span></a>
+    <a class="sidebar-item" data-chapter="chapter-5" href="#chapter-5"><span class="sidebar-num">05</span><div class="sidebar-item-text"><div class="sidebar-item-title">Python 数据分析库</div><div class="sidebar-item-meta">入门 · 3周</div></div><span class="sidebar-status">&#10003;</span></a>
+    <a class="sidebar-item" data-chapter="chapter-6" href="#chapter-6"><span class="sidebar-num">06</span><div class="sidebar-item-text"><div class="sidebar-item-title">数据挖掘算法应用</div><div class="sidebar-item-meta">高级 · 3周</div></div><span class="sidebar-status">&#10003;</span></a>
+  </nav>
+</aside>
+<button class="sidebar-toggle" id="sidebarToggle" title="收起/展开目录">&#9664;</button>
+<div class="main-content" id="main-content">
+<div class="content-wrapper">
+  <div class="camp-hero fade-in"><div class="camp-hero-icon">&#128269;</div><h1>数据分析技术训练营</h1><p>从零基础到实战 · 6大模块 · 视频+教程+代码+练习</p></div>
+  <div class="camp-stats fade-in"><div class="camp-stat"><div class="camp-stat-num">6</div><div class="camp-stat-label">课程章节</div></div><div class="camp-stat"><div class="camp-stat-num">18</div><div class="camp-stat-label">代码示例</div></div><div class="camp-stat"><div class="camp-stat-num">18</div><div class="camp-stat-label">练习题</div></div><div class="camp-stat"><div class="camp-stat-num">15周</div><div class="camp-stat-label">建议周期</div></div></div>
+  <div class="pyodide-status" id="pyodideStatus"><span class="status-dot loading" id="pyodideDot"></span><span id="pyodideText">Python 运行环境加载中，首次加载约需 10MB ...</span><div class="pyodide-progress" id="pyodideProgress"><div class="pyodide-progress-bar" id="pyodideProgressBar"></div></div></div>
 
-<div class="sub-page"><div id="main-content">
-  <div class="container">
-    <div class="camp-hero fade-in">
-      <div class="camp-hero-icon">🔍</div>
-      <h2>数据分析技术训练营</h2>
-      <p>从零基础到实战 · 6大模块 · 方法+教程+练习</p>
-    </div>
+<div class="chapter fade-in" id="chapter-1">
+  <div class="chapter-header"><span class="chapter-icon">&#129529;</span><div class="chapter-info"><div class="chapter-label">Chapter 01</div><h2 class="chapter-title">数据清洗与预处理</h2></div><div class="chapter-tags"><span class="chapter-tag">入门</span><span class="chapter-tag purple">2周</span></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#127909;</span><span class="title">视频解说</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="video-placeholder"><div class="play-icon">&#9654;</div><div class="text">Python数据清洗入门教程</div><div class="hint">B站视频嵌入占位 · 后续替换为实际视频</div></div></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#128214;</span><span class="title">图文教程</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="tutorial-content">
+    <h4>1. 认识脏数据</h4><p>在真实世界中，数据几乎从来不是完美的。打开一个 CSV 文件，你可能会发现<strong>缺失值</strong>（某些格子是空的）、<strong>重复行</strong>、<strong>异常值</strong>（比如年龄=200）、<strong>格式错误</strong>。使用 Pandas 的 <code>df.info()</code> 和 <code>df.describe()</code> 可以快速了解数据全貌。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+data = {<span class="str">'姓名'</span>: [<span class="str">'张三'</span>, <span class="str">'李四'</span>, <span class="str">'王五'</span>, <span class="str">'张三'</span>, <span class="str">'赵六'</span>],
+    <span class="str">'年龄'</span>: [<span class="num">25</span>, <span class="num">30</span>, <span class="kw">None</span>, <span class="num">25</span>, <span class="num">200</span>],
+    <span class="str">'工资'</span>: [<span class="num">5000</span>, <span class="num">8000</span>, <span class="num">6000</span>, <span class="num">5000</span>, <span class="num">7000</span>]}
+df = pd.DataFrame(data)
+<span class="bi">print</span>(<span class="str">"数据形状:"</span>, df.shape)
+<span class="bi">print</span>(df.isnull().sum())
+<span class="bi">print</span>(df.describe())</pre></div>
+    <h4>2. 处理缺失值</h4><p>缺失值处理有三种策略：<strong>删除</strong>、<strong>填充</strong>（均值/中位数/众数）、<strong>插值</strong>。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="cm"># 删除缺失行</span>
+df_clean = df.dropna()
+<span class="cm"># 中位数填充（对异常值更鲁棒）</span>
+df_filled = df.fillna({<span class="str">'年龄'</span>: df[<span class="str">'年龄'</span>].median()})
+<span class="bi">print</span>(<span class="str">"填充后:"</span>, df_filled)</pre></div>
+    <h4>3. 重复值与异常值</h4><p>使用 <code>df.duplicated()</code> 检测重复行。使用 <strong>IQR 方法</strong>检测异常值。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="bi">print</span>(<span class="str">"重复行:"</span>, df.duplicated().sum())
+Q1, Q3 = df[<span class="str">'年龄'</span>].quantile([<span class="num">0.25</span>, <span class="num">0.75</span>])
+IQR = Q3 - Q1
+outliers = df[(df[<span class="str">'年龄'</span>] &lt; Q1-<span class="num">1.5</span>*IQR) | (df[<span class="str">'年龄'</span>] &gt; Q3+<span class="num">1.5</span>*IQR)]
+<span class="bi">print</span>(<span class="str">"异常值:\n"</span>, outliers)</pre></div>
+  </div></div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128161;</span><span class="title">详细解释</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="explain-card"><div class="label">&#10067; 为什么数据清洗如此重要？</div><p>数据科学界名言：<span class="hl">"Garbage In, Garbage Out"</span>。数据科学家约花费 <span class="hl">60-80%</span> 的时间在数据清洗上。</p></div>
+    <div class="explain-card"><div class="label">&#128736; 怎么选择缺失值处理方法？</div><p><span class="hl">删除</span>：缺失 &lt; 5% 时最简单。<span class="hl">均值</span>：适合正态分布。<span class="hl">中位数</span>：有异常值时更鲁棒。<span class="hl">众数</span>：适合分类数据。</p></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128187;</span><span class="title">动手练习</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="code-editor-wrapper"><div class="code-editor-toolbar"><span class="label">&#128187; Python 编辑器</span><div class="code-editor-actions"><button class="btn-reset" onclick="resetCode(this)">重置</button><button class="btn-run" onclick="runCode(this)" disabled><span class="run-text">&#9654; 运行</span><span class="spinner"></span></button></div></div>
+    <textarea class="code-textarea" spellcheck="false">import pandas as pd
+import numpy as np
 
-    <div class="camp-stats fade-in">
-      <div class="camp-stat">
-        <div class="camp-stat-num">6</div>
-        <div class="camp-stat-label">课程模块</div>
-      </div>
-      <div class="camp-stat">
-        <div class="camp-stat-num">30</div>
-        <div class="camp-stat-label">教程步骤</div>
-      </div>
-      <div class="camp-stat">
-        <div class="camp-stat-num">24</div>
-        <div class="camp-stat-label">实战练习</div>
-      </div>
-      <div class="camp-stat">
-        <div class="camp-stat-num">15周</div>
-        <div class="camp-stat-label">建议周期</div>
-      </div>
-    </div>
+np.random.seed(42)
+data = {
+    'PassengerId': range(1, 21),
+    'Name': [f'乘客{i}' for i in range(1, 21)],
+    'Age': [22, 38, 26, 35, None, 28, 54, 2, 27, 14,
+            4, 58, 20, 39, 14, 55, 2, None, 31, None],
+    'Fare': [7.25, 71.28, 7.92, 53.10, 8.05, 8.46, 51.86,
+            21.08, 11.13, 30.07, 16.70, 26.55, 7.85, 31.28,
+            7.85, 16.00, 29.12, 18.00, 7.75, 7.75],
+    'Sex': ['male','female','female','female','male','male',
+            'male','male','female','female','female','male',
+            'female','female','female','male','male','female',
+            'male','female']
+}
+df = pd.DataFrame(data)
 
-    
-      <div class="module-card fade-in">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-icon">🧹</span>
-            <div>
-              <span class="module-number">模块 01</span>
-              <h3 class="module-title-text">数据清洗与预处理</h3>
-            </div>
-          </div>
-          <div class="module-meta">
-            <span class="meta-tag">入门</span>
-            <span class="meta-tag">2周</span>
-          </div>
-        </div>
+print("=== 缺失值统计 ===")
+print(df.isnull().sum())
 
-        <div class="module-section">
-          <div class="section-label">📖 学习方法</div>
-          <p class="method-text">「脏数据 → 干净数据」是数据分析的第一步。学习方法：先理解"什么是脏数据"（缺失值、重复值、异常值、格式错误），再动手用 Python/Pandas 逐个解决。建议用真实数据集练习，比如 Kaggle 上的 Titanic 数据集——它有缺失值、有分类编码、有异常值，非常适合入门。</p>
-        </div>
+age_median = df['Age'].median()
+df['Age'] = df['Age'].fillna(age_median)
+print(f"\n用中位数 {age_median} 填充后: {df['Age'].isnull().sum()} 个缺失")
 
-        <div class="module-section">
-          <div class="section-label">📝 教程步骤</div>
-          <div class="steps-list">
-            
-              <div class="learn-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h5 class="step-title">认识脏数据</h5>
-                  <p class="step-desc">打开一个 CSV 文件，用 Pandas 的 df.info() 和 df.describe() 观察数据全貌，找出哪些列有缺失值、哪些数据类型不对</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h5 class="step-title">处理缺失值</h5>
-                  <p class="step-desc">学习 df.isnull().sum() 统计缺失、df.fillna() 填充、df.dropna() 删除。理解什么时候该填充（均值/中位数/众数）、什么时候该删除</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h5 class="step-title">处理重复值</h5>
-                  <p class="step-desc">学习 df.duplicated() 检测重复、df.drop_duplicates() 去重。理解"完全重复"和"部分重复"的区别</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                  <h5 class="step-title">处理异常值</h5>
-                  <p class="step-desc">学习用箱线图（boxplot）和 IQR 方法识别异常值，理解 3σ 原则，决定是删除、修正还是保留异常值</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">5</div>
-                <div class="step-content">
-                  <h5 class="step-title">数据类型转换</h5>
-                  <p class="step-desc">学习 astype() 转换数据类型、pd.to_datetime() 处理日期、字符串拆分与合并</p>
-                </div>
-              </div>
-          </div>
-        </div>
+Q1 = df['Fare'].quantile(0.25)
+Q3 = df['Fare'].quantile(0.75)
+upper = Q3 + 1.5 * (Q3 - Q1)
+outliers = df[df['Fare'] > upper]
+print(f"\nFare 异常值阈值: {upper:.2f}, 数量: {len(outliers)}")
 
-        <div class="module-section">
-          <div class="section-label">💪 练习题</div>
-          <div class="exercises-list">
-            
-              <div class="exercise-item">
-                <span class="exercise-num">练习 1</span>
-                <p class="exercise-text">打开 Titanic 数据集，统计每列的缺失值数量，用合适的方法填充 Age 列的缺失值</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 2</span>
-                <p class="exercise-text">找出数据中所有重复行并删除，验证去重后行数是否正确</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 3</span>
-                <p class="exercise-text">用箱线图找出 Fare 列的异常值，选择一种合理方式处理</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 4</span>
-                <p class="exercise-text">将 Sex 列从文字转为数字编码（male=1, female=0），将 Embarked 列转为独热编码</p>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="module-card fade-in">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-icon">⚙️</span>
-            <div>
-              <span class="module-number">模块 02</span>
-              <h3 class="module-title-text">特征工程实战</h3>
-            </div>
-          </div>
-          <div class="module-meta">
-            <span class="meta-tag">进阶</span>
-            <span class="meta-tag">2周</span>
-          </div>
-        </div>
+df['Sex_encoded'] = df['Sex'].map({'male': 1, 'female': 0})
+print("\n编码后:")
+print(df[['Name', 'Sex', 'Sex_encoded']].head(10))</textarea>
+    <div class="code-output" id="output-1"></div></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#9989;</span><span class="title">练习题</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q1.</span> 以下哪个方法最适合处理少量缺失值（&lt; 5%）？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 用 0 填充</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 直接删除含缺失值的行</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 忽略不做处理</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 用最大值填充</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。缺失比例很小时直接删除最简单有效。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q2.</span> IQR 方法中异常值判定范围是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 均值 +/- 2个标准差</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. Q1 - IQR ~ Q3 + IQR</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. Q1 - 1.5*IQR ~ Q3 + 1.5*IQR</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 最小值 ~ 最大值</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'C')">查看答案</button><div class="quiz-explanation"><strong>答案：C</strong>。IQR 方法用 Q1-1.5*IQR 和 Q3+1.5*IQR 作为异常值边界。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q3.</span> 有异常值时填充缺失值应优先选择？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 均值</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 中位数</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 最大值</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 最小值</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。中位数不受极端值影响，更能代表数据中心趋势。</div></div>
+  </div></div>
+</div>
 
-        <div class="module-section">
-          <div class="section-label">📖 学习方法</div>
-          <p class="method-text">特征工程是"把原始数据变成模型能理解的数字"的过程。学习方法：先理解"为什么需要特征工程"（原始数据往往不能直接喂给模型），再学习常用技巧。核心思想是：用领域知识创造新特征，让模型更容易发现规律。</p>
-        </div>
+<div class="chapter fade-in" id="chapter-2">
+  <div class="chapter-header"><span class="chapter-icon">&#9881;&#65039;</span><div class="chapter-info"><div class="chapter-label">Chapter 02</div><h2 class="chapter-title">特征工程实战</h2></div><div class="chapter-tags"><span class="chapter-tag purple">进阶</span><span class="chapter-tag">2周</span></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#127909;</span><span class="title">视频解说</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="video-placeholder"><div class="play-icon">&#9654;</div><div class="text">特征工程 Python 实战教程</div><div class="hint">B站视频嵌入占位 · 后续替换为实际视频</div></div></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#128214;</span><span class="title">图文教程</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="tutorial-content">
+    <h4>1. 标准化与归一化</h4><p><strong>标准化</strong>将数据转为均值0、标准差1。<strong>归一化</strong>缩放到 [0, 1]。特征量纲差异大时必须先做标准化。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+data = np.array([[<span class="num">25</span>,<span class="num">5000</span>],[<span class="num">30</span>,<span class="num">8000</span>],[<span class="num">35</span>,<span class="num">12000</span>],[<span class="num">40</span>,<span class="num">15000</span>]])
+<span class="cm"># 标准化</span>
+data_std = (data - data.mean(axis=<span class="num">0</span>)) / data.std(axis=<span class="num">0</span>)
+<span class="bi">print</span>(<span class="str">"标准化后均值:"</span>, data_std.mean(axis=<span class="num">0</span>).round(<span class="num">4</span>))
+<span class="cm"># 归一化</span>
+data_norm = (data - data.min(axis=<span class="num">0</span>)) / (data.max(axis=<span class="num">0</span>) - data.min(axis=<span class="num">0</span>))
+<span class="bi">print</span>(<span class="str">"归一化范围:"</span>, data_norm.min(axis=<span class="num">0</span>), "~", data_norm.max(axis=<span class="num">0</span>))</pre></div>
+    <h4>2. 编码技术</h4><p><strong>标签编码</strong>将分类值映射为整数。<strong>独热编码</strong>为每个类别创建二进制列。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+colors = pd.Series([<span class="str">'红'</span>,<span class="str">'绿'</span>,<span class="str">'蓝'</span>,<span class="str">'红'</span>,<span class="str">'绿'</span>])
+<span class="bi">print</span>(<span class="str">"标签编码:"</span>, colors.map({v:i <span class="kw">for</span> i,v <span class="kw">in</span> <span class="bi">enumerate</span>(colors.unique())}).tolist())
+<span class="bi">print</span>(<span class="str">"独热编码:\n"</span>, pd.get_dummies(colors, prefix=<span class="str">'颜色'</span>))</pre></div>
+    <h4>3. 特征创建</h4><p>从现有特征创造新特征：数学组合、日期拆分、文本提取。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+df = pd.DataFrame({<span class="str">'建造年份'</span>:[<span class="num">2000</span>,<span class="num">1995</span>,<span class="num">2010</span>],<span class="str">'总面积'</span>:[<span class="num">120</span>,<span class="num">85</span>,<span class="num">150</span>],<span class="str">'价格'</span>:[<span class="num">300</span>,<span class="num">220</span>,<span class="num">450</span>]})
+df[<span class="str">'房屋年龄'</span>] = <span class="num">2024</span> - df[<span class="str">'建造年份'</span>]
+df[<span class="str">'每平米价格'</span>] = (df[<span class="str">'价格'</span>] / df[<span class="str">'总面积'</span>]).round(<span class="num">2</span>)
+<span class="bi">print</span>(df)</pre></div>
+  </div></div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128161;</span><span class="title">详细解释</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="explain-card"><div class="label">&#10067; 为什么特征工程比模型选择更重要？</div><p><span class="hl">"特征决定上限，模型只是逼近上限"</span>。好的特征能让简单模型超越复杂模型。</p></div>
+    <div class="explain-card"><div class="label">&#128736; 标准化 vs 归一化？</div><p><span class="hl">标准化</span>适合 SVM、逻辑回归。<span class="hl">归一化</span>适合 KNN、图像处理。有异常值时优先用标准化。</p></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128187;</span><span class="title">动手练习</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="code-editor-wrapper"><div class="code-editor-toolbar"><span class="label">&#128187; Python 编辑器</span><div class="code-editor-actions"><button class="btn-reset" onclick="resetCode(this)">重置</button><button class="btn-run" onclick="runCode(this)" disabled><span class="run-text">&#9654; 运行</span><span class="spinner"></span></button></div></div>
+    <textarea class="code-textarea" spellcheck="false">import pandas as pd
+import numpy as np
 
-        <div class="module-section">
-          <div class="section-label">📝 教程步骤</div>
-          <div class="steps-list">
-            
-              <div class="learn-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h5 class="step-title">理解特征工程</h5>
-                  <p class="step-desc">什么是特征？为什么特征比模型更重要？好的特征能让简单模型超越复杂模型。学习"垃圾进，垃圾出"原则</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h5 class="step-title">数值特征处理</h5>
-                  <p class="step-desc">学习标准化（StandardScaler）、归一化（MinMaxScaler）、对数变换、分箱（binning）等技巧</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h5 class="step-title">分类特征编码</h5>
-                  <p class="step-desc">学习标签编码（LabelEncoder）、独热编码（OneHotEncoder）、目标编码（TargetEncoder），理解各自的适用场景</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                  <h5 class="step-title">特征创建</h5>
-                  <p class="step-desc">从现有特征中创造新特征：日期拆分（年/月/日/星期）、文本提取（字数/词频）、数学组合（加减乘除/比率）</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">5</div>
-                <div class="step-content">
-                  <h5 class="step-title">特征选择</h5>
-                  <p class="step-desc">学习相关性分析、方差阈值过滤、递归特征消除（RFE），理解"不是特征越多越好"</p>
-                </div>
-              </div>
-          </div>
-        </div>
+np.random.seed(42)
+n = 50
+df = pd.DataFrame({
+    '建造年份': np.random.randint(1980, 2024, n),
+    '总面积': np.random.randint(50, 300, n),
+    '卧室数': np.random.randint(1, 6, n),
+    '地段等级': np.random.choice(['A','B','C','D'], n),
+    '价格': np.random.randint(100, 1000, n) * 1000
+})
+print("=== 原始数据 ===")
+print(df.head())
+print(f"形状: {df.shape}")
 
-        <div class="module-section">
-          <div class="section-label">💪 练习题</div>
-          <div class="exercises-list">
-            
-              <div class="exercise-item">
-                <span class="exercise-num">练习 1</span>
-                <p class="exercise-text">对 House Prices 数据集进行特征工程：创建"房屋年龄"特征（建造年份→至今的年数）</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 2</span>
-                <p class="exercise-text">对分类特征进行独热编码，对比编码前后的数据维度变化</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 3</span>
-                <p class="exercise-text">计算所有数值特征与目标变量的相关系数，选出 Top 10 最相关的特征</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 4</span>
-                <p class="exercise-text">尝试用对数变换处理偏态分布的价格数据，观察变换前后的分布差异</p>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="module-card fade-in">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-icon">📊</span>
-            <div>
-              <span class="module-number">模块 03</span>
-              <h3 class="module-title-text">数据建模与分析</h3>
-            </div>
-          </div>
-          <div class="module-meta">
-            <span class="meta-tag">进阶</span>
-            <span class="meta-tag">3周</span>
-          </div>
-        </div>
+df['房屋年龄'] = 2024 - df['建造年份']
+df['每平米价格'] = (df['价格'] / df['总面积']).round(0)
+df_encoded = pd.get_dummies(df, columns=['地段等级'], prefix='地段')
+print(f"\n编码后形状: {df_encoded.shape}")
 
-        <div class="module-section">
-          <div class="section-label">📖 学习方法</div>
-          <p class="method-text">数据建模是用数学方法从数据中发现规律的过程。学习方法：从最简单的线性回归开始，逐步过渡到决策树、随机森林。每个模型都按"理解原理→代码实现→评估效果"三步走。不要追求模型的复杂度，先确保理解基础。</p>
-        </div>
+for col in ['房屋年龄', '总面积', '每平米价格']:
+    m, s = df_encoded[col].mean(), df_encoded[col].std()
+    df_encoded[col+'_std'] = ((df_encoded[col]-m)/s).round(3)
+print("\n标准化后:")
+print(df_encoded[['房屋年龄','房屋年龄_std']].head())
 
-        <div class="module-section">
-          <div class="section-label">📝 教程步骤</div>
-          <div class="steps-list">
-            
-              <div class="learn-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h5 class="step-title">回归分析入门</h5>
-                  <p class="step-desc">理解"用一条线拟合数据"的思想。学习线性回归的原理、损失函数（MSE）、梯度下降。用代码实现预测房价</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h5 class="step-title">分类分析入门</h5>
-                  <p class="step-desc">理解"把数据分成几类"的思想。学习逻辑回归、决策树。用代码实现预测用户是否会购买</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h5 class="step-title">模型评估指标</h5>
-                  <p class="step-desc">回归用 R²/MAE/RMSE，分类用 准确率/精确率/召回率/F1。理解"准确率高不等于模型好"（类别不平衡问题）</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                  <h5 class="step-title">训练集与测试集</h5>
-                  <p class="step-desc">理解为什么要拆分数据。学习 train_test_split、交叉验证（Cross Validation）。理解过拟合和欠拟合</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">5</div>
-                <div class="step-content">
-                  <h5 class="step-title">集成学习方法</h5>
-                  <p class="step-desc">学习随机森林（多棵树投票）、梯度提升（XGBoost/LightGBM）。理解"三个臭皮匠顶个诸葛亮"的集成思想</p>
-                </div>
-              </div>
-          </div>
-        </div>
+print("\n与价格的相关系数:")
+print(df[['房屋年龄','总面积','卧室数','价格']].corr()['价格'].sort_values(ascending=False))</textarea>
+    <div class="code-output" id="output-2"></div></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#9989;</span><span class="title">练习题</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q1.</span> 独热编码的主要缺点是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 编码速度慢</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 会显著增加数据维度</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 无法处理字符串</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 只能处理二分类</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。100个取值的特征独热编码会新增100列，导致维度灾难。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q2.</span> 标准化后均值和标准差分别是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 均值=0, 标准差=0</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 均值=1, 标准差=0</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 均值=0, 标准差=1</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 均值=1, 标准差=1</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'C')">查看答案</button><div class="quiz-explanation"><strong>答案：C</strong>。标准化公式 (x-mean)/std 变换后均值为0，标准差为1。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q3.</span> 哪种方法不适合有序分类变量（"低"、"中"、"高"）？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 标签编码</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 独热编码</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 有序编码</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 目标编码</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。独热编码会丢失有序变量间的顺序关系。</div></div>
+  </div></div>
+</div>
 
-        <div class="module-section">
-          <div class="section-label">💪 练习题</div>
-          <div class="exercises-list">
-            
-              <div class="exercise-item">
-                <span class="exercise-num">练习 1</span>
-                <p class="exercise-text">用线性回归预测波士顿房价，计算 R² 分数和 MAE，画出预测值 vs 真实值的散点图</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 2</span>
-                <p class="exercise-text">用逻辑回归预测客户流失，计算精确率和召回率，思考哪个指标更重要</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 3</span>
-                <p class="exercise-text">对比决策树和随机森林在同一数据集上的表现，理解为什么随机森林通常更好</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 4</span>
-                <p class="exercise-text">用 5 折交叉验证评估模型稳定性，观察不同折的分数波动</p>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="module-card fade-in">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-icon">🗄️</span>
-            <div>
-              <span class="module-number">模块 04</span>
-              <h3 class="module-title-text">SQL 高级查询技巧</h3>
-            </div>
-          </div>
-          <div class="module-meta">
-            <span class="meta-tag">入门</span>
-            <span class="meta-tag">2周</span>
-          </div>
-        </div>
+<div class="chapter fade-in" id="chapter-3">
+  <div class="chapter-header"><span class="chapter-icon">&#128202;</span><div class="chapter-info"><div class="chapter-label">Chapter 03</div><h2 class="chapter-title">数据建模与分析</h2></div><div class="chapter-tags"><span class="chapter-tag purple">进阶</span><span class="chapter-tag">3周</span></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#127909;</span><span class="title">视频解说</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="video-placeholder"><div class="play-icon">&#9654;</div><div class="text">机器学习入门 Python 教程</div><div class="hint">B站视频嵌入占位 · 后续替换为实际视频</div></div></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#128214;</span><span class="title">图文教程</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="tutorial-content">
+    <h4>1. 线性回归</h4><p>用 <code>y = wx + b</code> 拟合数据，最小化均方误差（MSE）。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+X = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>], dtype=<span class="cls">float</span>)
+y = np.array([<span class="num">2.1</span>,<span class="num">3.9</span>,<span class="num">6.2</span>,<span class="num">7.8</span>,<span class="num">10.1</span>])
+w = ((X-X.mean())*(y-y.mean())).sum() / ((X-X.mean())**<span class="num">2</span>).sum()
+b = y.mean() - w*X.mean()
+y_pred = w*X + b
+r2 = <span class="num">1</span> - ((y-y_pred)**<span class="num">2</span>).sum()/((y-y.mean())**<span class="num">2</span>).sum()
+<span class="bi">print</span>(<span class="str">f"y = {w:.2f}x + {b:.2f}, R² = {r2:.4f}"</span>)</pre></div>
+    <h4>2. 逻辑回归（分类）</h4><p>通过 Sigmoid 函数映射到 [0,1] 概率值，用于二分类。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">def</span> <span class="fn">sigmoid</span>(z): <span class="kw">return</span> <span class="num">1</span>/(<span class="num">1</span>+np.exp(-z))
+hours = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>,<span class="num">7</span>,<span class="num">8</span>], dtype=<span class="cls">float</span>)
+passed = np.array([<span class="num">0</span>,<span class="num">0</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="num">1</span>])
+prob = sigmoid(<span class="num">0.8</span>*hours - <span class="num">3.0</span>)
+pred = (prob >= <span class="num">0.5</span>).astype(<span class="cls">int</span>)
+<span class="bi">print</span>(<span class="str">f"准确率: {(pred==passed).mean():.2%}"</span>)</pre></div>
+    <h4>3. 模型评估</h4><p>回归看 R²/MAE/RMSE，分类看精确率/召回率/F1。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+yt = np.array([<span class="num">1</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">0</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">1</span>])
+yp = np.array([<span class="num">1</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">0</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="num">0</span>,<span class="num">1</span>,<span class="num">1</span>])
+tp=((yp==1)&(yt==1)).sum(); fp=((yp==1)&(yt==0)).sum()
+fn=((yp==0)&(yt==1)).sum(); tn=((yp==0)&(yt==0)).sum()
+prec=tp/(tp+fp) if tp+fp else 0; rec=tp/(tp+fn) if tp+fn else 0
+f1=2*prec*rec/(prec+rec) if prec+rec else 0
+<span class="bi">print</span>(<span class="str">f"准确率:{(tp+tn)/len(yt):.2%} 精确率:{prec:.2%} 召回率:{rec:.2%} F1:{f1:.2%}"</span>)</pre></div>
+  </div></div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128161;</span><span class="title">详细解释</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="explain-card"><div class="label">&#10067; 为什么需要交叉验证？</div><p><span class="hl">K 折交叉验证</span>将数据分成 K 份轮流测试，取平均值，结果更稳定可靠。</p></div>
+    <div class="explain-card"><div class="label">&#128736; 过拟合 vs 欠拟合？</div><p><span class="hl">过拟合</span>：训练好但测试差（死记硬背）。<span class="hl">欠拟合</span>：训练和测试都差（太简单）。</p></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128187;</span><span class="title">动手练习</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="code-editor-wrapper"><div class="code-editor-toolbar"><span class="label">&#128187; Python 编辑器</span><div class="code-editor-actions"><button class="btn-reset" onclick="resetCode(this)">重置</button><button class="btn-run" onclick="runCode(this)" disabled><span class="run-text">&#9654; 运行</span><span class="spinner"></span></button></div></div>
+    <textarea class="code-textarea" spellcheck="false">import numpy as np
 
-        <div class="module-section">
-          <div class="section-label">📖 学习方法</div>
-          <p class="method-text">SQL 是数据分析的"母语"，几乎所有数据工作都离不开它。学习方法：先掌握基础查询（SELECT/WHERE/GROUP BY），再学高级技巧（窗口函数/子查询/CTE）。每天写 1-2 道 SQL 题，在 LeetCode 或牛客网上刷题是最快的进步方式。</p>
-        </div>
+np.random.seed(42)
+X = np.random.uniform(0, 10, 100)
+y = 2.5 * X + 3 + np.random.normal(0, 2, 100)
 
-        <div class="module-section">
-          <div class="section-label">📝 教程步骤</div>
-          <div class="steps-list">
-            
-              <div class="learn-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h5 class="step-title">SQL 基础查询</h5>
-                  <p class="step-desc">掌握 SELECT、WHERE、ORDER BY、LIMIT。学会用 WHERE 过滤数据，用 ORDER BY 排序，用 LIMIT 分页</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h5 class="step-title">聚合与分组</h5>
-                  <p class="step-desc">掌握 GROUP BY、HAVING、COUNT/SUM/AVG/MAX/MIN。理解 GROUP BY 和 WHERE 的区别（WHERE 过滤行，HAVING 过滤组）</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h5 class="step-title">多表关联</h5>
-                  <p class="step-desc">掌握 INNER JOIN、LEFT JOIN、RIGHT JOIN、FULL JOIN。理解不同 JOIN 的区别，学会用 ON 指定关联条件</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                  <h5 class="step-title">子查询与 CTE</h5>
-                  <p class="step-desc">学习子查询（WHERE 中的 SELECT）、CTE（WITH ... AS）。理解什么时候用子查询、什么时候用 JOIN</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">5</div>
-                <div class="step-content">
-                  <h5 class="step-title">窗口函数</h5>
-                  <p class="step-desc">学习 ROW_NUMBER/RANK/DENSE_RANK、LAG/LEAD、SUM OVER。这是 SQL 最强大的功能，面试必考</p>
-                </div>
-              </div>
-          </div>
-        </div>
+X_mean, y_mean = X.mean(), y.mean()
+w = ((X - X_mean) * (y - y_mean)).sum() / ((X - X_mean)**2).sum()
+b = y_mean - w * X_mean
+y_pred = w * X + b
 
-        <div class="module-section">
-          <div class="section-label">💪 练习题</div>
-          <div class="exercises-list">
-            
-              <div class="exercise-item">
-                <span class="exercise-num">练习 1</span>
-                <p class="exercise-text">写一个 SQL 查询：找出每个部门的平均工资，只显示平均工资大于 5000 的部门</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 2</span>
-                <p class="exercise-text">写一个 SQL 查询：找出工资最高的前 3 名员工，用窗口函数实现</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 3</span>
-                <p class="exercise-text">写一个 SQL 查询：计算每个员工与其上一个月的工资差额（用 LAG 函数）</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 4</span>
-                <p class="exercise-text">写一个 SQL 查询：找出连续 3 天都有登录记录的用户（经典面试题）</p>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="module-card fade-in">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-icon">🐍</span>
-            <div>
-              <span class="module-number">模块 05</span>
-              <h3 class="module-title-text">Python 数据分析库</h3>
-            </div>
-          </div>
-          <div class="module-meta">
-            <span class="meta-tag">入门</span>
-            <span class="meta-tag">3周</span>
-          </div>
-        </div>
+mse = ((y - y_pred)**2).mean()
+r2 = 1 - ((y - y_pred)**2).sum() / ((y - y_mean)**2).sum()
+print("=== 线性回归 ===")
+print(f"方程: y = {w:.4f}x + {b:.4f}")
+print(f"MSE: {mse:.4f}, RMSE: {np.sqrt(mse):.4f}, R²: {r2:.4f}")
 
-        <div class="module-section">
-          <div class="section-label">📖 学习方法</div>
-          <p class="method-text">Python 数据分析三大件：Pandas（数据处理）、NumPy（数值计算）、Matplotlib/Seaborn（可视化）。学习方法：不要死记 API，而是理解"数据结构"——Series 是一维数组，DataFrame 是二维表格。所有操作都是"对表格的增删改查"。</p>
-        </div>
+print("\n=== 分类评估 ===")
+yt = np.array([1,0,1,1,0,1,0,0,1,1,0,1,1,0,1,0,1,0,1,1])
+yp = np.array([1,0,1,0,0,1,1,0,1,1,0,1,0,0,1,0,1,1,1,0])
+tp=((yp==1)&(yt==1)).sum(); fp=((yp==1)&(yt==0)).sum()
+fn=((yp==0)&(yt==1)).sum(); tn=((yp==0)&(yt==0)).sum()
+prec=tp/(tp+fp) if tp+fp else 0; rec=tp/(tp+fn) if tp+fn else 0
+f1=2*prec*rec/(prec+rec) if prec+rec else 0
+print(f"准确率:{(tp+tn)/len(yt):.2%} 精确率:{prec:.2%} 召回率:{rec:.2%} F1:{f1:.2%}")</textarea>
+    <div class="code-output" id="output-3"></div></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#9989;</span><span class="title">练习题</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q1.</span> R² 分数的取值范围是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. [0, 1]</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. (-inf, 1]</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. [0, 100]</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. [-1, 1]</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。R² 可以为负值（模型比均值还差时），越接近1越好。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q2.</span> 医疗诊断场景中哪个指标最重要？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 准确率</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 精确率</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 召回率</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. F1</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'C')">查看答案</button><div class="quiz-explanation"><strong>答案：C</strong>。漏诊代价远高于误诊，召回率（不漏掉病人）最重要。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q3.</span> 哪种方法能有效防止过拟合？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 更复杂的模型</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 增加训练数据量</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 减少交叉验证折数</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 使用全部特征</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。增加数据量是最直接有效的防过拟合方法。</div></div>
+  </div></div>
+</div>
 
-        <div class="module-section">
-          <div class="section-label">📝 教程步骤</div>
-          <div class="steps-list">
-            
-              <div class="learn-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h5 class="step-title">NumPy 基础</h5>
-                  <p class="step-desc">学习 ndarray 数组的创建、索引、运算。理解向量化操作比循环快 100 倍。掌握广播机制</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h5 class="step-title">Pandas 数据读取</h5>
-                  <p class="step-desc">学习 read_csv/read_excel/read_sql 读取数据。理解 df.shape/df.columns/df.dtypes 等基础属性</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h5 class="step-title">Pandas 数据筛选</h5>
-                  <p class="step-desc">学习 df[条件]、df.loc[]、df.iloc[] 三种筛选方式。掌握多条件组合筛选（&/|/~）</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                  <h5 class="step-title">Pandas 数据聚合</h5>
-                  <p class="step-desc">学习 groupby()+agg()、pivot_table()、merge()。理解"分组→聚合→合并"的分析流程</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">5</div>
-                <div class="step-content">
-                  <h5 class="step-title">Matplotlib 可视化</h5>
-                  <p class="step-desc">学习折线图/柱状图/散点图/直方图/箱线图的绘制。掌握图表美化（标题/标签/颜色/大小）</p>
-                </div>
-              </div>
-          </div>
-        </div>
+<div class="chapter fade-in" id="chapter-4">
+  <div class="chapter-header"><span class="chapter-icon">&#128451;&#65039;</span><div class="chapter-info"><div class="chapter-label">Chapter 04</div><h2 class="chapter-title">SQL 高级查询技巧</h2></div><div class="chapter-tags"><span class="chapter-tag">入门</span><span class="chapter-tag purple">2周</span></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#127909;</span><span class="title">视频解说</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="video-placeholder"><div class="play-icon">&#9654;</div><div class="text">SQL 入门教程</div><div class="hint">B站视频嵌入占位 · 后续替换为实际视频</div></div></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#128214;</span><span class="title">图文教程</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="tutorial-content">
+    <h4>1. SQL 基础查询</h4><p><code>SELECT</code> 选择列，<code>FROM</code> 指定表，<code>WHERE</code> 过滤条件。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">SQL</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">SELECT</span> name, salary <span class="kw">FROM</span> employees
+<span class="kw">WHERE</span> salary > <span class="num">5000</span> <span class="kw">AND</span> department = <span class="str">'技术部'</span>
+<span class="kw">ORDER BY</span> salary <span class="kw">DESC</span> <span class="kw">LIMIT</span> <span class="num">10</span>;</pre></div>
+    <h4>2. 聚合与分组</h4><p><code>GROUP BY</code> 分组，<code>HAVING</code> 过滤组。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">SQL</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">SELECT</span> department, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> 人数, <span class="fn">AVG</span>(salary) <span class="kw">AS</span> 平均工资
+<span class="kw">FROM</span> employees <span class="kw">GROUP BY</span> department
+<span class="kw">HAVING</span> <span class="fn">AVG</span>(salary) > <span class="num">5000</span>;</pre></div>
+    <h4>3. 窗口函数</h4><p>不折叠行，为每行计算额外值。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">SQL</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">SELECT</span> name, salary,
+  <span class="fn">ROW_NUMBER</span>() <span class="kw">OVER</span>(<span class="kw">PARTITION BY</span> department <span class="kw">ORDER BY</span> salary <span class="kw">DESC</span>) <span class="kw">AS</span> 排名
+<span class="kw">FROM</span> employees;
 
-        <div class="module-section">
-          <div class="section-label">💪 练习题</div>
-          <div class="exercises-list">
-            
-              <div class="exercise-item">
-                <span class="exercise-num">练习 1</span>
-                <p class="exercise-text">用 Pandas 读取一个 CSV 文件，筛选出年龄在 20-30 岁且工资大于 5000 的员工</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 2</span>
-                <p class="exercise-text">用 groupby 按部门分组，计算每个部门的人数、平均工资、最高工资</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 3</span>
-                <p class="exercise-text">用 merge 将员工表和部门表关联，找出每个员工所属的部门名称</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 4</span>
-                <p class="exercise-text">用 Matplotlib 画出各部门平均工资的柱状图，并标注数值</p>
-              </div>
-          </div>
-        </div>
-      </div>
-      <div class="module-card fade-in">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-icon">⛏️</span>
-            <div>
-              <span class="module-number">模块 06</span>
-              <h3 class="module-title-text">数据挖掘算法应用</h3>
-            </div>
-          </div>
-          <div class="module-meta">
-            <span class="meta-tag">高级</span>
-            <span class="meta-tag">3周</span>
-          </div>
-        </div>
+<span class="kw">SELECT</span> month, revenue,
+  <span class="fn">LAG</span>(revenue, <span class="num">1</span>) <span class="kw">OVER</span>(<span class="kw">ORDER BY</span> month) <span class="kw">AS</span> 上月
+<span class="kw">FROM</span> sales;</pre></div>
+  </div></div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128161;</span><span class="title">详细解释</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="explain-card"><div class="label">&#10067; WHERE vs HAVING？</div><p><span class="hl">WHERE</span> 分组前过滤行。<span class="hl">HAVING</span> 分组后过滤组。执行顺序：FROM->WHERE->GROUP BY->HAVING->SELECT。</p></div>
+    <div class="explain-card"><div class="label">&#128736; ROW_NUMBER vs RANK？</div><p><span class="hl">ROW_NUMBER</span>：连续 1,2,3,4。<span class="hl">RANK</span>：并列跳号 1,2,2,4。<span class="hl">DENSE_RANK</span>：并列不跳 1,2,2,3。</p></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128187;</span><span class="title">动手练习</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="code-editor-wrapper"><div class="code-editor-toolbar"><span class="label">&#128187; Python 模拟 SQL</span><div class="code-editor-actions"><button class="btn-reset" onclick="resetCode(this)">重置</button><button class="btn-run" onclick="runCode(this)" disabled><span class="run-text">&#9654; 运行</span><span class="spinner"></span></button></div></div>
+    <textarea class="code-textarea" spellcheck="false">import pandas as pd
+import numpy as np
 
-        <div class="module-section">
-          <div class="section-label">📖 学习方法</div>
-          <p class="method-text">数据挖掘是从大量数据中发现隐藏模式的过程。学习方法：先理解"挖掘什么"（分类/聚类/关联/回归），再学具体算法。每个算法都按"生活类比→数学原理→代码实现→实际应用"四步学习。比如 K-Means 聚类就像"把一堆水果按颜色和大小自动分组"。</p>
-        </div>
+np.random.seed(42)
+emp = pd.DataFrame({
+    'id': range(1, 21),
+    'name': [f'员工{i}' for i in range(1, 21)],
+    'department': np.random.choice(['技术部','市场部','财务部','人事部'], 20),
+    'salary': np.random.randint(3000, 15000, 20)
+})
+print("=== 员工表 ===")
+print(emp.to_string(index=False))
 
-        <div class="module-section">
-          <div class="section-label">📝 教程步骤</div>
-          <div class="steps-list">
-            
-              <div class="learn-step">
-                <div class="step-num">1</div>
-                <div class="step-content">
-                  <h5 class="step-title">聚类分析</h5>
-                  <p class="step-desc">学习 K-Means 算法：随机选 K 个中心点→分配每个点到最近中心→更新中心→重复。用肘部法则选 K 值。实际应用：客户分群</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">2</div>
-                <div class="step-content">
-                  <h5 class="step-title">关联规则</h5>
-                  <p class="step-desc">学习 Apriori 算法：支持度→置信度→提升度。理解"买啤酒的人也会买尿布"的关联分析思想。实际应用：购物篮分析</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">3</div>
-                <div class="step-content">
-                  <h5 class="step-title">降维分析</h5>
-                  <p class="step-desc">学习 PCA 主成分分析：把高维数据压缩到低维，保留主要信息。理解方差解释率。实际应用：数据可视化、特征压缩</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">4</div>
-                <div class="step-content">
-                  <h5 class="step-title">时间序列分析</h5>
-                  <p class="step-desc">学习移动平均、指数平滑、ARIMA 模型。理解趋势、季节性、残差三要素。实际应用：销量预测</p>
-                </div>
-              </div>
-              <div class="learn-step">
-                <div class="step-num">5</div>
-                <div class="step-content">
-                  <h5 class="step-title">综合实战项目</h5>
-                  <p class="step-desc">用真实数据集完成一个端到端的数据挖掘项目：数据探索→清洗→特征工程→建模→评估→可视化报告</p>
-                </div>
-              </div>
-          </div>
-        </div>
+print("\n=== GROUP BY + HAVING ===")
+r = emp.groupby('department').agg(人数=('id','count'),平均工资=('salary','mean')).round(0)
+print(r[r['平均工资'] > 5000].sort_values('平均工资', ascending=False))
 
-        <div class="module-section">
-          <div class="section-label">💪 练习题</div>
-          <div class="exercises-list">
-            
-              <div class="exercise-item">
-                <span class="exercise-num">练习 1</span>
-                <p class="exercise-text">用 K-Means 对客户消费数据进行聚类，分成 3-5 个客户群体，分析每个群体的特征</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 2</span>
-                <p class="exercise-text">用 Apriori 算法分析超市购物篮数据，找出支持度 > 5% 且置信度 > 60% 的关联规则</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 3</span>
-                <p class="exercise-text">对高维数据集进行 PCA 降维，画出前两个主成分的散点图，观察数据分布</p>
-              </div>
-              <div class="exercise-item">
-                <span class="exercise-num">练习 4</span>
-                <p class="exercise-text">对一组月度销售数据进行 ARIMA 建模，预测未来 6 个月的销售额</p>
-              </div>
-          </div>
-        </div>
-      </div>
+print("\n=== ROW_NUMBER ===")
+emp['排名'] = emp.groupby('department')['salary'].rank(method='first', ascending=False).astype(int)
+print(emp.sort_values(['department','排名']).to_string(index=False))
 
-    <div style="text-align:center;" class="fade-in">
-      <a href="skills.html" class="camp-back">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
-        返回技能矩阵
-      </a>
-    </div>
+print("\n=== LAG 环比 ===")
+sales = pd.DataFrame({'month':['1月','2月','3月','4月','5月','6月'],'revenue':[100,120,115,140,135,160]})
+sales['上月'] = sales['revenue'].shift(1)
+sales['增长'] = sales['revenue'] - sales['上月']
+print(sales.to_string(index=False))</textarea>
+    <div class="code-output" id="output-4"></div></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#9989;</span><span class="title">练习题</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q1.</span> SQL 正确执行顺序是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. SELECT->FROM->WHERE</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. FROM->WHERE->GROUP BY->HAVING->SELECT</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. FROM->SELECT->WHERE</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. WHERE->FROM->GROUP BY</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。逻辑执行顺序：FROM->WHERE->GROUP BY->HAVING->SELECT->ORDER BY->LIMIT。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q2.</span> RANK() 并列第2名后下一个排名是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 2</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 3</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 4</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 5</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'C')">查看答案</button><div class="quiz-explanation"><strong>答案：C</strong>。RANK() 遇到并列会跳号，两个第2名后是第4名。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q3.</span> 窗口函数和 GROUP BY 的主要区别？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 窗口函数更快</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 窗口函数不折叠行</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. GROUP BY 更强大</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 没区别</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。GROUP BY 折叠行，窗口函数保留每行并附加统计信息。</div></div>
+  </div></div>
+</div>
+
+<div class="chapter fade-in" id="chapter-5">
+  <div class="chapter-header"><span class="chapter-icon">&#128013;</span><div class="chapter-info"><div class="chapter-label">Chapter 05</div><h2 class="chapter-title">Python 数据分析库</h2></div><div class="chapter-tags"><span class="chapter-tag">入门</span><span class="chapter-tag purple">3周</span></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#127909;</span><span class="title">视频解说</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="video-placeholder"><div class="play-icon">&#9654;</div><div class="text">Pandas 数据分析教程</div><div class="hint">B站视频嵌入占位 · 后续替换为实际视频</div></div></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#128214;</span><span class="title">图文教程</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="tutorial-content">
+    <h4>1. NumPy 基础</h4><p><code>ndarray</code> 数组，<strong>向量化运算</strong>比循环快 10-100 倍。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+arr = np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>])
+<span class="bi">print</span>(<span class="str">"向量化:"</span>, arr * <span class="num">2</span> + <span class="num">10</span>)
+<span class="bi">print</span>(<span class="str">"均值:"</span>, arr.mean(), <span class="str">"标准差:"</span>, arr.std())
+a = np.array([[<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>]]); b = np.array([[<span class="num">10</span>],[<span class="num">20</span>]])
+<span class="bi">print</span>(<span class="str">"广播:\n"</span>, a + b)</pre></div>
+    <h4>2. Pandas 数据操作</h4><p>核心操作：<strong>筛选、分组、聚合、合并</strong>。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+df = pd.DataFrame({<span class="str">'部门'</span>:[<span class="str">'技术'</span>,<span class="str">'市场'</span>,<span class="str">'技术'</span>],<span class="str">'工资'</span>:[<span class="num">8000</span>,<span class="num">6000</span>,<span class="num">12000</span>]})
+<span class="bi">print</span>(df[df[<span class="str">'工资'</span>] > <span class="num">7000</span>])
+<span class="bi">print</span>(df.groupby(<span class="str">'部门'</span>).agg(平均工资=(<span class="str">'工资'</span>,<span class="str">'mean'</span>)))</pre></div>
+    <h4>3. 文本可视化</h4>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre>months = [<span class="str">'1月'</span>,<span class="str">'2月'</span>,<span class="str">'3月'</span>,<span class="str">'4月'</span>,<span class="str">'5月'</span>,<span class="str">'6月'</span>]
+sales = [<span class="num">100</span>,<span class="num">120</span>,<span class="num">115</span>,<span class="num">140</span>,<span class="num">135</span>,<span class="num">160</span>]
+<span class="kw">for</span> m, s <span class="kw">in</span> <span class="bi">zip</span>(months, sales):
+    <span class="bi">print</span>(<span class="str">f"  {m} | {'█' * int(s/max(sales)*30)} {s}万"</span>)</pre></div>
+  </div></div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128161;</span><span class="title">详细解释</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="explain-card"><div class="label">&#10067; 为什么 NumPy 比 Python 循环快？</div><p>NumPy 底层用 <span class="hl">C 语言</span>实现，利用连续内存和 SIMD 指令集，向量化运算避免了 Python 循环开销。</p></div>
+    <div class="explain-card"><div class="label">&#128736; loc vs iloc？</div><p><span class="hl">df.loc[]</span> 基于标签索引。<span class="hl">df.iloc[]</span> 基于位置索引。记忆：loc=label，iloc=integer location。</p></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128187;</span><span class="title">动手练习</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="code-editor-wrapper"><div class="code-editor-toolbar"><span class="label">&#128187; Python 编辑器</span><div class="code-editor-actions"><button class="btn-reset" onclick="resetCode(this)">重置</button><button class="btn-run" onclick="runCode(this)" disabled><span class="run-text">&#9654; 运行</span><span class="spinner"></span></button></div></div>
+    <textarea class="code-textarea" spellcheck="false">import pandas as pd
+import numpy as np
+
+np.random.seed(42)
+n = 100
+df = pd.DataFrame({
+    '员工ID': range(1001, 1001+n),
+    '部门': np.random.choice(['技术部','市场部','财务部','人事部','运营部'], n),
+    '年龄': np.random.randint(22, 55, n),
+    '工资': np.random.randint(4000, 25000, n),
+    '绩效': np.random.uniform(60, 100, n).round(1)
+})
+
+print("=== 概览 ===")
+print(f"形状: {df.shape}")
+print(df.describe().round(1))
+
+print("\n=== 高薪精英 ===")
+elite = df[(df['工资']>15000) & (df['绩效']>80)]
+print(f"共 {len(elite)} 人")
+
+print("\n=== 部门统计 ===")
+dept = df.groupby('部门').agg(人数=('员工ID','count'),平均工资=('工资','mean'),平均绩效=('绩效','mean')).round(1).sort_values('平均工资', ascending=False)
+print(dept.to_string())
+
+print("\n=== 相关性 ===")
+print(df[['年龄','工资','绩效']].corr().round(3))
+
+print("\n=== 部门工资柱状图 ===")
+ds = df.groupby('部门')['工资'].mean().sort_values(ascending=True)
+mx = ds.max()
+for d, s in ds.items():
+    print(f"  {d:4s} | {'█' * int(s/mx*25)} {s:.0f}")</textarea>
+    <div class="code-output" id="output-5"></div></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#9989;</span><span class="title">练习题</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q1.</span> Series 和 DataFrame 的区别？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 没区别</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. Series 一维，DataFrame 二维</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. DataFrame 一维，Series 二维</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. Series 只能存数字</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。Series 是一维数组，DataFrame 是二维表格。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q2.</span> 基于标签的索引方法是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. df.iloc[]</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. df.loc[]</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. df.ix[]</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. df.get[]</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。loc 基于标签，iloc 基于位置。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q3.</span> NumPy 广播机制规则是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 形状必须完全相同</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 从尾部维度比较，兼容维度相等或其中一个是1</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 只能一维数组</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 会修改原数组</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。广播从最右维度比较，兼容条件是相等或其中一个是1。</div></div>
+  </div></div>
+</div>
+
+<div class="chapter fade-in" id="chapter-6">
+  <div class="chapter-header"><span class="chapter-icon">&#9874;&#65039;</span><div class="chapter-info"><div class="chapter-label">Chapter 06</div><h2 class="chapter-title">数据挖掘算法应用</h2></div><div class="chapter-tags"><span class="chapter-tag pink">高级</span><span class="chapter-tag purple">3周</span></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#127909;</span><span class="title">视频解说</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="video-placeholder"><div class="play-icon">&#9654;</div><div class="text">数据挖掘 Python 实战教程</div><div class="hint">B站视频嵌入占位 · 后续替换为实际视频</div></div></div></div>
+  <div class="chapter-section"><div class="section-title-bar open" onclick="toggleSection(this)"><span class="icon">&#128214;</span><span class="title">图文教程</span><span class="arrow">&#9660;</span></div><div class="section-body open"><div class="tutorial-content">
+    <h4>1. K-Means 聚类</h4><p>把数据分成 K 组，使组内相似、组间不同。步骤：选中心->分配->更新->重复。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">def</span> <span class="fn">kmeans</span>(X, k, max_iters=<span class="num">100</span>):
+    np.random.seed(<span class="num">42</span>)
+    centers = X[np.random.choice(<span class="bi">len</span>(X), k, replace=<span class="kw">False</span>)].copy()
+    <span class="kw">for</span> _ <span class="kw">in</span> <span class="bi">range</span>(max_iters):
+        dists = np.array([[np.sqrt(((x-c)**<span class="num">2</span>).sum()) <span class="kw">for</span> c <span class="kw">in</span> centers] <span class="kw">for</span> x <span class="kw">in</span> X])
+        labels = dists.argmin(axis=<span class="num">1</span>)
+        new_c = np.array([X[labels==i].mean(axis=<span class="num">0</span>) <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(k)])
+        <span class="kw">if</span> np.allclose(centers, new_c): <span class="kw">break</span>
+        centers = new_c
+    <span class="kw">return</span> labels, centers
+
+np.random.seed(<span class="num">42</span>)
+X = np.vstack([np.random.normal([<span class="num">2</span>,<span class="num">2</span>],<span class="num">0.5</span>,(<span class="num">30</span>,<span class="num">2</span>)),
+               np.random.normal([<span class="num">8</span>,<span class="num">8</span>],<span class="num">0.5</span>,(<span class="num">30</span>,<span class="num">2</span>)),
+               np.random.normal([<span class="num">2</span>,<span class="num">8</span>],<span class="num">0.5</span>,(<span class="num">30</span>,<span class="num">2</span>))])
+labels, centers = kmeans(X, <span class="num">3</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">3</span>):
+    <span class="bi">print</span>(<span class="str">f"簇{i}: {(labels==i).sum()}个点, 中心=({centers[i][0]:.1f}, {centers[i][1]:.1f})"</span>)</pre></div>
+    <h4>2. PCA 降维</h4><p>把高维数据压缩到低维，保留主要信息。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+np.random.seed(<span class="num">42</span>)
+X = np.random.randn(<span class="num">100</span>, <span class="num">5</span>)
+<span class="cm"># 手动 PCA</span>
+X_centered = X - X.mean(axis=<span class="num">0</span>)
+cov = np.cov(X_centered, rowvar=<span class="kw">False</span>)
+eigenvalues, eigenvectors = np.linalg.eigh(cov)
+idx = np.argsort(eigenvalues)[::-<span class="num">1</span>]
+eigenvalues = eigenvalues[idx]
+eigenvectors = eigenvectors[:, idx]
+variance_ratio = eigenvalues / eigenvalues.sum()
+<span class="bi">print</span>(<span class="str">"各主成分方差解释率:"</span>, variance_ratio.round(<span class="num">4</span>))
+<span class="bi">print</span>(<span class="str">"前2个累计:"</span>, variance_ratio[:<span class="num">2</span>].sum().round(<span class="num">4</span>))</pre></div>
+    <h4>3. 时间序列分析</h4><p>移动平均、指数平滑，用于趋势预测。</p>
+    <div class="code-block"><div class="code-block-header"><span class="code-block-lang">Python</span><button class="code-block-copy" onclick="copyCode(this)">复制</button></div><pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+np.random.seed(<span class="num">42</span>)
+sales = np.cumsum(np.random.randn(<span class="num">12</span>) * <span class="num">10</span>) + <span class="num">100</span>
+months = [<span class="str">f'{i+1}月'</span> <span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="num">12</span>)]
+<span class="cm"># 3个月移动平均</span>
+ma3 = np.convolve(sales, np.ones(<span class="num">3</span>)/<span class="num">3</span>, mode=<span class="str">'valid'</span>)
+<span class="bi">print</span>(<span class="str">"月份 | 实际 | MA3"</span>)
+<span class="kw">for</span> i <span class="kw">in</span> <span class="bi">range</span>(<span class="bi">len</span>(ma3)):
+    <span class="bi">print</span>(<span class="str">f"  {months[i+1]} | {sales[i+1]:.1f} | {ma3[i]:.1f}"</span>)</pre></div>
+  </div></div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128161;</span><span class="title">详细解释</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="explain-card"><div class="label">&#10067; K-Means 的 K 值怎么选？</div><p>常用<span class="hl">肘部法则</span>：计算不同 K 值的簇内误差平方和（SSE），画图找"拐点"。拐点对应的 K 就是最优值。</p></div>
+    <div class="explain-card"><div class="label">&#128736; PCA 降维会丢失信息吗？</div><p>会。<span class="hl">方差解释率</span>告诉我们保留了多少信息。通常保留累计解释率 > 85% 的主成分即可。</p></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#128187;</span><span class="title">动手练习</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="code-editor-wrapper"><div class="code-editor-toolbar"><span class="label">&#128187; Python 编辑器</span><div class="code-editor-actions"><button class="btn-reset" onclick="resetCode(this)">重置</button><button class="btn-run" onclick="runCode(this)" disabled><span class="run-text">&#9654; 运行</span><span class="spinner"></span></button></div></div>
+    <textarea class="code-textarea" spellcheck="false">import numpy as np
+
+# === K-Means 聚类 ===
+def kmeans(X, k, max_iters=100):
+    np.random.seed(42)
+    centers = X[np.random.choice(len(X), k, replace=False)].copy()
+    for _ in range(max_iters):
+        dists = np.array([[np.sqrt(((x-c)**2).sum()) for c in centers] for x in X])
+        labels = dists.argmin(axis=1)
+        new_c = np.array([X[labels==i].mean(axis=0) for i in range(k)])
+        if np.allclose(centers, new_c): break
+        centers = new_c
+    return labels, centers
+
+np.random.seed(42)
+X = np.vstack([
+    np.random.normal([2,2], 0.5, (30,2)),
+    np.random.normal([8,8], 0.5, (30,2)),
+    np.random.normal([2,8], 0.5, (30,2))
+])
+
+labels, centers = kmeans(X, 3)
+print("=== K-Means 聚类结果 ===")
+for i in range(3):
+    pts = X[labels==i]
+    print(f"簇{i}: {len(pts)}个点, 中心=({centers[i][0]:.2f}, {centers[i][1]:.2f})")
+    print(f"  X范围: [{pts[:,0].min():.1f}, {pts[:,0].max():.1f}]")
+    print(f"  Y范围: [{pts[:,1].min():.1f}, {pts[:,1].max():.1f}]")
+
+# === PCA 降维 ===
+print("\n=== PCA 降维 ===")
+np.random.seed(42)
+data = np.random.randn(100, 5)
+data_centered = data - data.mean(axis=0)
+cov = np.cov(data_centered, rowvar=False)
+eigenvalues, eigenvectors = np.linalg.eigh(cov)
+idx = np.argsort(eigenvalues)[::-1]
+eigenvalues = eigenvalues[idx]
+var_ratio = eigenvalues / eigenvalues.sum()
+print("方差解释率:", var_ratio.round(4))
+print(f"前2个累计: {var_ratio[:2].sum():.2%}")
+print(f"前3个累计: {var_ratio[:3].sum():.2%}")
+
+# === 时间序列 ===
+print("\n=== 时间序列移动平均 ===")
+np.random.seed(42)
+sales = np.cumsum(np.random.randn(12) * 10) + 100
+months = [f'{i+1}月' for i in range(12)]
+ma3 = np.convolve(sales, np.ones(3)/3, mode='valid')
+print("月份 | 实际    | MA3")
+for i in range(len(ma3)):
+    print(f"  {months[i+1]}  | {sales[i+1]:7.1f} | {ma3[i]:.1f}")</textarea>
+    <div class="code-output" id="output-6"></div></div>
+  </div></div>
+  <div class="chapter-section"><div class="section-title-bar" onclick="toggleSection(this)"><span class="icon">&#9989;</span><span class="title">练习题</span><span class="arrow">&#9660;</span></div><div class="section-body">
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q1.</span> K-Means 算法需要预先指定什么？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 学习率</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 聚类数 K</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 迭代次数上限</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 收敛阈值</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。K-Means 必须预先指定 K 值（聚类数），可用肘部法则选择最优 K。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q2.</span> PCA 降维后保留的信息量用什么衡量？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 均方误差</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 方差解释率</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 准确率</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. F1 分数</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。方差解释率表示每个主成分保留的原始信息比例，累计值越高保留越多。</div></div>
+    <div class="quiz-item"><div class="quiz-question"><span class="q-num">Q3.</span> 移动平均的主要作用是？</div><div class="quiz-options"><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>A. 增加数据量</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>B. 平滑噪声，揭示趋势</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>C. 检测异常值</span></label><label class="quiz-option" onclick="selectOption(this)"><span class="radio"></span><span>D. 特征选择</span></label></div><button class="quiz-btn" onclick="checkAnswer(this, 'B')">查看答案</button><div class="quiz-explanation"><strong>答案：B</strong>。移动平均通过取窗口内的均值来平滑短期波动，揭示数据的长期趋势。</div></div>
+  </div></div>
+</div>
+
+  <div style="text-align:center" class="fade-in">
+    <a href="skills.html" class="camp-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>返回技能矩阵</a>
   </div>
 </div></div>
 
 <footer class="footer">
-  <div class="container">
-    <p class="footer-text">用 <span class="heart">♥</span> 与代码构建 · 徐梓豪的个人主页</p>
-    <p class="footer-text" style="margin-top: 0.5rem; font-size: 0.8rem; color: rgba(136, 146, 176, 0.6);">&copy; 2026 · 广东科学技术职业学院 · 商学院</p>
+  <div style="max-width:900px;margin:0 auto;padding:0 2rem;">
+    <p class="footer-text">用 <span class="heart">&#9829;</span> 与代码构建 · 徐梓豪的个人主页</p>
+    <p class="footer-text" style="margin-top:.5rem;font-size:.8rem;color:rgba(136,146,176,0.6);">&copy; 2026 · 广东科学技术职业学院 · 商学院</p>
   </div>
 </footer>
 
 <script>
-// ========== 粒子网络动画（增强版） ==========
-(function() {
-  const canvas = document.getElementById('particles-canvas');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
-  let mouse = { x: null, y: null, radius: 180 };
-  const maxDist = 140;
-  const mouseLineDist = 200;
-
-  function resize() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resize();
-  window.addEventListener('resize', debounce(init, 400));
-
-  function debounce(fn, ms) {
-    let t; return function() { clearTimeout(t); t = setTimeout(fn, ms); };
-  }
-
-  let rafId;
-  window.addEventListener('mousemove', function(e) {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-  });
-  window.addEventListener('mouseleave', function() {
-    mouse.x = null;
-    mouse.y = null;
-  });
-
-  // 颜色池：青、紫、蓝、粉
-  const colors = [
-    { r: 0, g: 240, b: 255 },   // cyan
-    { r: 180, g: 74, b: 255 },   // purple
-    { r: 74, g: 106, b: 255 },   // blue
-    { r: 255, g: 74, b: 141 }    // pink
-  ];
-
-  class Particle {
-    constructor() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height;
-      this.vx = (Math.random() - 0.5) * 0.6;
-      this.vy = (Math.random() - 0.5) * 0.6;
-      this.baseRadius = Math.random() * 1.8 + 0.6;
-      this.radius = this.baseRadius;
-      this.opacity = Math.random() * 0.5 + 0.25;
-      this.baseOpacity = this.opacity;
-      // 随机颜色
-      this.color = colors[Math.floor(Math.random() * colors.length)];
-      // 脉冲参数
-      this.pulseSpeed = Math.random() * 0.02 + 0.005;
-      this.pulsePhase = Math.random() * Math.PI * 2;
-    }
-    update(time) {
-      this.x += this.vx;
-      this.y += this.vy;
-      if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
-      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
-
-      // 脉冲呼吸效果
-      this.radius = this.baseRadius + Math.sin(time * this.pulseSpeed + this.pulsePhase) * 0.5;
-      this.opacity = this.baseOpacity + Math.sin(time * this.pulseSpeed + this.pulsePhase) * 0.1;
-
-      // 鼠标吸引交互
-      if (mouse.x !== null) {
-        const dx = this.x - mouse.x;
-        const dy = this.y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < mouse.radius) {
-          const force = (mouse.radius - dist) / mouse.radius;
-          this.x += dx * force * 0.008;
-          this.y += dy * force * 0.008;
-          // 靠近鼠标时变亮变大
-          this.radius = this.baseRadius + force * 2;
-          this.opacity = Math.min(1, this.baseOpacity + force * 0.5);
-        }
-      }
-    }
-    draw() {
-      const { r, g, b } = this.color;
-      // 外发光
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius * 3, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.opacity * 0.08})`;
-      ctx.fill();
-      // 核心
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${this.opacity})`;
-      ctx.fill();
-    }
-  }
-
-  function init() {
-    particles = [];
-    // 根据屏幕面积计算，平衡视觉效果与性能
-    const area = canvas.width * canvas.height;
-    const count = Math.min(Math.floor(area / 12000), 100);
-    for (let i = 0; i < count; i++) {
-      particles.push(new Particle());
-    }
-  }
+// ========== 粒子网络动画 ==========
+(function(){
+  var canvas=document.getElementById('particles-canvas'),ctx=canvas.getContext('2d'),particles=[],mouse={x:null,y:null,radius:180},maxDist=140,mouseLineDist=200;
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+  resize();window.addEventListener('resize',function(){clearTimeout(window._rt);window._rt=setTimeout(init,400)});
+  window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY});
+  window.addEventListener('mouseleave',function(){mouse.x=null;mouse.y=null});
+  var colors=[{r:0,g:240,b:255},{r:180,g:74,b:255},{r:74,g:106,b:255},{r:255,g:74,b:141}];
+  function Particle(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.vx=(Math.random()-0.5)*0.6;this.vy=(Math.random()-0.5)*0.6;this.baseRadius=Math.random()*1.8+0.6;this.radius=this.baseRadius;this.opacity=Math.random()*0.5+0.25;this.baseOpacity=this.opacity;this.color=colors[Math.floor(Math.random()*colors.length)];this.pulseSpeed=Math.random()*0.02+0.005;this.pulsePhase=Math.random()*Math.PI*2}
+  Particle.prototype.update=function(time){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>canvas.width)this.vx*=-1;if(this.y<0||this.y>canvas.height)this.vy*=-1;this.radius=this.baseRadius+Math.sin(time*this.pulseSpeed+this.pulsePhase)*0.5;this.opacity=this.baseOpacity+Math.sin(time*this.pulseSpeed+this.pulsePhase)*0.1;if(mouse.x!==null){var dx=this.x-mouse.x,dy=this.y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<mouse.radius){var force=(mouse.radius-dist)/mouse.radius;this.x+=dx*force*0.008;this.y+=dy*force*0.008;this.radius=this.baseRadius+force*2;this.opacity=Math.min(1,this.baseOpacity+force*0.5)}}};
+  Particle.prototype.draw=function(){var c=this.color;ctx.beginPath();ctx.arc(this.x,this.y,this.radius*3,0,Math.PI*2);ctx.fillStyle='rgba('+c.r+','+c.g+','+c.b+','+(this.opacity*0.08)+')';ctx.fill();ctx.beginPath();ctx.arc(this.x,this.y,this.radius,0,Math.PI*2);ctx.fillStyle='rgba('+c.r+','+c.g+','+c.b+','+this.opacity+')';ctx.fill()};
+  function init(){particles=[];var area=canvas.width*canvas.height,count=Math.min(Math.floor(area/12000),100);for(var i=0;i<count;i++)particles.push(new Particle)}
   init();
-
-  function connectParticles() {
-    const len = particles.length;
-    const maxDistSq = maxDist * maxDist;
-    for (let i = 0; i < len; i++) {
-      for (let j = i + 1; j < len; j++) {
-        const dx = particles[i].x - particles[j].x;
-        const dy = particles[i].y - particles[j].y;
-        const distSq = dx * dx + dy * dy;
-        if (distSq < maxDistSq) {
-          const dist = Math.sqrt(distSq);
-          const opacity = (1 - dist / maxDist) * 0.2;
-          // 混合两个粒子的颜色
-          const c1 = particles[i].color;
-          const c2 = particles[j].color;
-          const mr = Math.round((c1.r + c2.r) / 2);
-          const mg = Math.round((c1.g + c2.g) / 2);
-          const mb = Math.round((c1.b + c2.b) / 2);
-          ctx.beginPath();
-          ctx.moveTo(particles[i].x, particles[i].y);
-          ctx.lineTo(particles[j].x, particles[j].y);
-          ctx.strokeStyle = `rgba(${mr}, ${mg}, ${mb}, ${opacity})`;
-          ctx.lineWidth = 0.6;
-          ctx.stroke();
-        }
-      }
-    }
-
-    // 鼠标与粒子的连线
-    if (mouse.x !== null) {
-      for (let i = 0; i < len; i++) {
-        const dx = particles[i].x - mouse.x;
-        const dy = particles[i].y - mouse.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < mouseLineDist) {
-          const opacity = (1 - dist / mouseLineDist) * 0.35;
-          const c = particles[i].color;
-          ctx.beginPath();
-          ctx.moveTo(mouse.x, mouse.y);
-          ctx.lineTo(particles[i].x, particles[i].y);
-          ctx.strokeStyle = `rgba(${c.r}, ${c.g}, ${c.b}, ${opacity})`;
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
-        }
-      }
-      // 鼠标光标光晕
-      const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 60);
-      gradient.addColorStop(0, 'rgba(0, 240, 255, 0.06)');
-      gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
-      ctx.beginPath();
-      ctx.arc(mouse.x, mouse.y, 60, 0, Math.PI * 2);
-      ctx.fillStyle = gradient;
-      ctx.fill();
-    }
-  }
-
-  let time = 0;
-  function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    time++;
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].update(time);
-      particles[i].draw();
-    }
-    connectParticles();
-    rafId = requestAnimationFrame(animate);
-  }
-
-  // 页面不可见时暂停动画
-  document.addEventListener('visibilitychange', function() {
-    if (document.hidden) {
-      cancelAnimationFrame(rafId);
-    } else {
-      animate();
-    }
-  });
+  function connectParticles(){var len=particles.length,maxDistSq=maxDist*maxDist;for(var i=0;i<len;i++){for(var j=i+1;j<len;j++){var dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,distSq=dx*dx+dy*dy;if(distSq<maxDistSq){var dist=Math.sqrt(distSq),opacity=(1-dist/maxDist)*0.2,c1=particles[i].color,c2=particles[j].color;ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);ctx.strokeStyle='rgba('+Math.round((c1.r+c2.r)/2)+','+Math.round((c1.g+c2.g)/2)+','+Math.round((c1.b+c2.b)/2)+','+opacity+')';ctx.lineWidth=0.6;ctx.stroke()}}if(mouse.x!==null){var dx=particles[i].x-mouse.x,dy=particles[i].y-mouse.y,dist=Math.sqrt(dx*dx+dy*dy);if(dist<mouseLineDist){var opacity=(1-dist/mouseLineDist)*0.35,c=particles[i].color;ctx.beginPath();ctx.moveTo(mouse.x,mouse.y);ctx.lineTo(particles[i].x,particles[i].y);ctx.strokeStyle='rgba('+c.r+','+c.g+','+c.b+','+opacity+')';ctx.lineWidth=0.8;ctx.stroke()}}}}
+  var time=0,rafId;
+  function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);time++;for(var i=0;i<particles.length;i++){particles[i].update(time);particles[i].draw()}connectParticles();rafId=requestAnimationFrame(animate)}
+  document.addEventListener('visibilitychange',function(){if(document.hidden)cancelAnimationFrame(rafId);else animate()});
   animate();
 })();
 
+// ========== 导航栏滚动 ==========
+window.addEventListener('scroll',function(){document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50)});
 
-// ========== 导航栏滚动效果 ==========
-window.addEventListener('scroll', function() {
-  const navbar = document.getElementById('navbar');
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-});
+// ========== 滚动动画 ==========
+var observer=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('visible');var bars=e.target.querySelectorAll('.skill-progress');bars.forEach(function(b){b.style.width=b.dataset.width+'%'})}})},{threshold:0.15});
+document.querySelectorAll('.fade-in').forEach(function(el){observer.observe(el)});
 
-// ========== 滚动进入动画 ==========
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      // 技能进度条动画
-      const bars = entry.target.querySelectorAll('.skill-progress');
-      bars.forEach(bar => {
-        bar.style.width = bar.dataset.width + '%';
-      });
-    }
+// ========== 侧边栏 ==========
+(function(){
+  var sidebar=document.getElementById('sidebar'),toggle=document.getElementById('sidebarToggle'),nav=document.getElementById('sidebarNav'),items=document.querySelectorAll('.sidebar-item'),chapters=document.querySelectorAll('.chapter');
+  toggle.addEventListener('click',function(){
+    if(window.innerWidth<=1024){sidebar.classList.toggle('mobile-open')}
+    else{sidebar.classList.toggle('collapsed')}
   });
-}, { threshold: 0.15 });
-
-document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-
-document.querySelectorAll('.hobby-card').forEach(card => {
-  card.addEventListener('mousemove', (e) => {
-    const rect = card.getBoundingClientRect();
-    card.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
-    card.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
-  });
-});
-
-
-
-
-// ========== SPA无刷新导航 ==========
-(function() {
-  var mainContent = document.getElementById('main-content');
-  if (!mainContent) return;
-
-  // 拦截所有内部链接
-  document.addEventListener('click', function(e) {
-    var link = e.target.closest('a[href]');
-    if (!link) return;
-    var href = link.getAttribute('href');
-    if (!href || !href.endsWith('.html')) return;
-    if (href === window.location.pathname.split('/').pop()) return;
-
-    e.preventDefault();
-
-    // 淡出当前内容
-    mainContent.classList.add('fade-out');
-
-    setTimeout(function() {
-      fetch(href)
-        .then(function(res) { return res.text(); })
-        .then(function(html) {
-          // 提取目标页面的 #main-content 内容
-          var parser = new DOMParser();
-          var doc = parser.parseFromString(html, 'text/html');
-          var newContent = doc.getElementById('main-content');
-          if (newContent) {
-            mainContent.innerHTML = newContent.innerHTML;
-            // 更新URL（不刷新页面）
-            history.pushState(null, '', href);
-            // 更新导航高亮
-            updateNav(href);
-            // 重新初始化动画观察器
-            initAnimations();
-            // 滚动到顶部
-            window.scrollTo(0, 0);
-          }
-          // 淡入新内容
-          mainContent.classList.remove('fade-out');
-        })
-        .catch(function() {
-          // fetch失败时回退到普通跳转
-          window.location.href = href;
-        });
-    }, 250);
-  });
-
-  // 更新导航高亮
-  function updateNav(href) {
-    var links = document.querySelectorAll('.nav-links a');
-    links.forEach(function(link) {
-      link.classList.remove('active');
-      if (link.getAttribute('href') === href) {
-        link.classList.add('active');
-      }
+  items.forEach(function(item){
+    item.addEventListener('click',function(e){
+      e.preventDefault();
+      var target=document.getElementById(item.dataset.chapter);
+      if(target){target.scrollIntoView({behavior:'smooth',block:'start'});if(window.innerWidth<=1024)sidebar.classList.remove('mobile-open')}
     });
-  }
-
-  // 重新初始化滚动动画
-  function initAnimations() {
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          var bars = entry.target.querySelectorAll('.skill-progress');
-          bars.forEach(function(bar) {
-            bar.style.width = bar.dataset.width + '%';
-          });
+  });
+  function updateActive(){
+    var scrollPos=window.scrollY+120;
+    chapters.forEach(function(ch){
+      var top=ch.offsetTop,bottom=top+ch.offsetHeight;
+      var id=ch.id;
+      items.forEach(function(item){
+        if(item.dataset.chapter===id){
+          if(scrollPos>=top&&scrollPos<bottom){item.classList.add('active')}
+          else{item.classList.remove('active')}
         }
       });
-    }, { threshold: 0.15 });
-    document.querySelectorAll('.fade-in:not(.visible)').forEach(function(el) {
-      observer.observe(el);
     });
   }
+  window.addEventListener('scroll',updateActive);
+  updateActive();
+})();
 
-  // 处理浏览器前进/后退
-  window.addEventListener('popstate', function() {
-    window.location.reload();
+// ========== 章节折叠 ==========
+function toggleSection(bar){
+  var body=bar.nextElementSibling;
+  bar.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+// ========== 代码复制 ==========
+function copyCode(btn){
+  var pre=btn.closest('.code-block').querySelector('pre');
+  var text=pre.textContent||pre.innerText;
+  navigator.clipboard.writeText(text).then(function(){btn.textContent='已复制!';setTimeout(function(){btn.textContent='复制'},1500)});
+}
+
+// ========== 练习题 ==========
+function selectOption(opt){
+  var quiz=opt.closest('.quiz-item');
+  quiz.querySelectorAll('.quiz-option').forEach(function(o){o.classList.remove('selected')});
+  opt.classList.add('selected');
+}
+function checkAnswer(btn,correct){
+  var quiz=btn.closest('.quiz-item');
+  var options=quiz.querySelectorAll('.quiz-option');
+  var explanation=quiz.querySelector('.quiz-explanation');
+  options.forEach(function(o){
+    o.style.pointerEvents='none';
+    var text=o.querySelector('span:last-child').textContent;
+    var letter=text.charAt(0);
+    if(letter===correct)o.classList.add('correct');
+    else if(o.classList.contains('selected'))o.classList.add('wrong');
   });
+  btn.disabled=true;
+  if(explanation)explanation.classList.add('visible');
+}
+
+// ========== 代码编辑器 ==========
+function resetCode(btn){
+  var wrapper=btn.closest('.code-editor-wrapper');
+  var textarea=wrapper.querySelector('.code-textarea');
+  textarea.value=textarea.dataset.original||textarea.value;
+  var output=wrapper.querySelector('.code-output');
+  if(output){output.classList.remove('visible');output.innerHTML=''}
+}
+function runCode(btn){
+  if(!window.pyodide){alert('Python 环境尚未加载完成，请稍候...');return}
+  var wrapper=btn.closest('.code-editor-wrapper');
+  var textarea=wrapper.querySelector('.code-textarea');
+  var output=wrapper.querySelector('.code-output');
+  if(!textarea.dataset.original)textarea.dataset.original=textarea.value;
+  var code=textarea.value;
+  btn.classList.add('loading');btn.disabled=true;
+  output.classList.add('visible');output.classList.remove('error');
+  output.innerHTML='<div class="code-output-header">运行中...</div><pre></pre>';
+  window.pyodide.runPythonAsync(code).then(function(result){
+    btn.classList.remove('loading');btn.disabled=false;
+    var stdout=window.pyodide.runPython('import sys; sys.stdout.getvalue()');
+    window.pyodide.runPython('import sys; sys.stdout = io.StringIO()');
+    var text=stdout||result||'（无输出）';
+    output.innerHTML='<div class="code-output-header">输出结果</div><pre>'+escapeHtml(text)+'</pre>';
+  }).catch(function(err){
+    btn.classList.remove('loading');btn.disabled=false;
+    output.classList.add('error');
+    output.innerHTML='<div class="code-output-header">错误</div><pre>'+escapeHtml(String(err))+'</pre>';
+  });
+}
+function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+// ========== Pyodide 加载 ==========
+(function(){
+  var statusEl=document.getElementById('pyodideStatus'),dotEl=document.getElementById('pyodideDot'),textEl=document.getElementById('pyodideText'),progressEl=document.getElementById('pyodideProgress'),progressBar=document.getElementById('pyodideProgressBar');
+  progressEl.classList.add('active');
+  var script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+  script.onload=function(){
+    textEl.textContent='正在初始化 Python 运行时...';
+    loadPyodide({
+      indexURL:'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
+    }).then(function(pyodide){
+      window.pyodide=pyodide;
+      progressBar.style.width='100%';
+      dotEl.className='status-dot ready';
+      textEl.textContent='Python 运行环境已就绪';
+      setTimeout(function(){progressEl.classList.remove('active')},500);
+      // 初始化 stdout 捕获
+      pyodide.runPython('import sys, io; sys.stdout = io.StringIO()');
+      // 启用所有运行按钮
+      document.querySelectorAll('.btn-run').forEach(function(b){b.disabled=false});
+    }).catch(function(err){
+      dotEl.className='status-dot error';
+      textEl.textContent='Python 环境加载失败: '+err.message;
+      progressBar.style.width='100%';
+      progressBar.style.background='#ef4444';
+    });
+  };
+  script.onerror=function(){
+    dotEl.className='status-dot error';
+    textEl.textContent='Pyodide 脚本加载失败，请检查网络连接';
+  };
+  document.body.appendChild(script);
+})();
+
+// ========== SPA 导航 ==========
+(function(){
+  var mainContent=document.getElementById('main-content');
+  if(!mainContent)return;
+  document.addEventListener('click',function(e){
+    var link=e.target.closest('a[href]');
+    if(!link)return;
+    var href=link.getAttribute('href');
+    if(!href||!href.endsWith('.html'))return;
+    if(href===window.location.pathname.split('/').pop())return;
+    e.preventDefault();
+    mainContent.classList.add('fade-out');
+    setTimeout(function(){
+      fetch(href).then(function(r){return r.text()}).then(function(html){
+        var parser=new DOMParser(),doc=parser.parseFromString(html,'text/html');
+        var newContent=doc.getElementById('main-content');
+        if(newContent){mainContent.innerHTML=newContent.innerHTML;history.pushState(null,'',href);window.scrollTo(0,0)}
+        mainContent.classList.remove('fade-out');
+      }).catch(function(){window.location.href=href});
+    },250);
+  });
+  window.addEventListener('popstate',function(){window.location.reload()});
 })();
 </script>
-</body>
-</html>
 </body>
 </html>
