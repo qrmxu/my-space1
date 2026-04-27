@@ -843,5 +843,374 @@ function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').r
   window.addEventListener('popstate',function(){window.location.reload()});
 })();
 </script>
+
+<!-- ========== 音乐播放器 ========== -->
+<div id="music-player">
+  <button id="music-toggle" onclick="toggleMusicPanel()">
+    <svg id="music-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20">
+      <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+    </svg>
+  </button>
+  <div id="music-panel" class="music-panel-hidden">
+    <div class="music-panel-header">
+      <span class="music-panel-title">🎵 我的歌单</span>
+      <button class="music-panel-close" onclick="toggleMusicPanel()">✕</button>
+    </div>
+    <div id="music-list"></div>
+    <div class="music-progress-bar">
+      <div id="music-progress" class="music-progress-fill"></div>
+    </div>
+    <div class="music-controls">
+      <button class="music-ctrl-btn" onclick="prevSong()" title="上一首">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      </button>
+      <button id="play-btn" class="music-ctrl-btn music-play-btn" onclick="togglePlay()" title="播放/暂停">
+        <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" width="22" height="22" style="display:none;"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+      </button>
+      <button class="music-ctrl-btn" onclick="nextSong()" title="下一首">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      </button>
+    </div>
+    <div id="music-now-playing" class="music-now-playing"></div>
+  </div>
+</div>
+
+<style>
+/* ========== 音乐播放器样式 ========== */
+#music-player {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+#music-toggle {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  color: #60A5FA;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+#music-toggle:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+  transform: scale(1.05);
+}
+
+#music-toggle.playing #music-icon {
+  animation: musicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.music-panel-hidden {
+  display: none !important;
+}
+
+#music-panel {
+  position: absolute;
+  top: 52px;
+  right: 0;
+  width: 280px;
+  background: rgba(15, 20, 35, 0.95);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(96, 165, 250, 0.2);
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 40px rgba(59, 130, 246, 0.08);
+  overflow: hidden;
+}
+
+.music-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.music-panel-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+.music-panel-close {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 0.2rem;
+  transition: color 0.2s;
+}
+
+.music-panel-close:hover { color: #fff; }
+
+#music-list {
+  max-height: 240px;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+}
+
+#music-list::-webkit-scrollbar { width: 4px; }
+#music-list::-webkit-scrollbar-track { background: transparent; }
+#music-list::-webkit-scrollbar-thumb { background: rgba(96,165,250,0.2); border-radius: 4px; }
+
+.music-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  border-radius: 0;
+}
+
+.music-item:hover {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.music-item.active {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.music-item.active .music-item-name {
+  color: #60A5FA;
+}
+
+.music-item-num {
+  font-size: 0.7rem;
+  color: #475569;
+  min-width: 1.2rem;
+  text-align: center;
+}
+
+.music-item.active .music-item-num {
+  color: #60A5FA;
+}
+
+.music-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-item-name {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.music-item-artist {
+  font-size: 0.68rem;
+  color: #64748b;
+}
+
+.music-progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  cursor: pointer;
+}
+
+.music-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.music-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0.6rem 0;
+}
+
+.music-ctrl-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.3rem;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.music-ctrl-btn:hover { color: #60A5FA; transform: scale(1.1); }
+
+.music-play-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #fff !important;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.3);
+}
+
+.music-play-btn:hover {
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4) !important;
+  transform: scale(1.08) !important;
+}
+
+.music-now-playing {
+  text-align: center;
+  padding: 0 1rem 0.7rem;
+  font-size: 0.72rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 响应式 */
+@media (max-width: 640px) {
+  #music-player { top: 70px; right: 12px; }
+  #music-panel { width: 260px; right: -8px; }
+}
+</style>
+
+<script>
+// ========== 音乐播放器功能 ==========
+(function() {
+  // 歌曲列表 - 请将音乐文件放到 music/ 目录下
+  var songs = [
+    { name: '够钟', artist: '周柏豪', file: 'music/gouzhong.mp3' },
+    { name: '小白', artist: '周柏豪', file: 'music/xiaobai.mp3' },
+    { name: '我的宣言', artist: '周柏豪', file: 'music/wodexuanyan.mp3' },
+    { name: '你瞒我瞒', artist: '陈柏宇', file: 'music/nimanwoman.mp3' },
+    { name: '飘雪', artist: '陈慧娴', file: 'music/piaoxue.mp3' },
+  ];
+
+  var currentIndex = 0;
+  var isPlaying = false;
+  var audio = new Audio();
+  var panelOpen = false;
+
+  // 渲染歌曲列表
+  var listEl = document.getElementById('music-list');
+  if (listEl) {
+    var html = '';
+    for (var i = 0; i < songs.length; i++) {
+      html += '<div class="music-item" data-index="' + i + '" onclick="selectSong(' + i + ')">' +
+        '<span class="music-item-num">' + String(i + 1).padStart(2, '0') + '</span>' +
+        '<div class="music-item-info">' +
+        '<div class="music-item-name">' + songs[i].name + '</div>' +
+        '<div class="music-item-artist">' + songs[i].artist + '</div>' +
+        '</div></div>';
+    }
+    listEl.innerHTML = html;
+  }
+
+  audio.addEventListener('timeupdate', function() {
+    if (audio.duration) {
+      var pct = (audio.currentTime / audio.duration) * 100;
+      var bar = document.getElementById('music-progress');
+      if (bar) bar.style.width = pct + '%';
+    }
+  });
+
+  audio.addEventListener('ended', function() {
+    nextSong();
+  });
+
+  audio.addEventListener('error', function() {
+    var np = document.getElementById('music-now-playing');
+    if (np) np.textContent = '⚠️ 音乐文件未找到，请将 mp3 放到 music/ 目录';
+  });
+
+  // 暴露到全局
+  window.toggleMusicPanel = function() {
+    panelOpen = !panelOpen;
+    var panel = document.getElementById('music-panel');
+    if (panelOpen) {
+      panel.classList.remove('music-panel-hidden');
+    } else {
+      panel.classList.add('music-panel-hidden');
+    }
+  };
+
+  window.togglePlay = function() {
+    if (!audio.src || audio.src === window.location.href) {
+      audio.src = songs[currentIndex].file;
+    }
+    if (isPlaying) {
+      audio.pause();
+      isPlaying = false;
+      document.getElementById('play-icon').style.display = '';
+      document.getElementById('pause-icon').style.display = 'none';
+      document.getElementById('music-toggle').classList.remove('playing');
+    } else {
+      audio.play().catch(function() {});
+      isPlaying = true;
+      document.getElementById('play-icon').style.display = 'none';
+      document.getElementById('pause-icon').style.display = '';
+      document.getElementById('music-toggle').classList.add('playing');
+      updateNowPlaying();
+    }
+  };
+
+  window.selectSong = function(index) {
+    currentIndex = index;
+    audio.src = songs[index].file;
+    audio.play().catch(function() {});
+    isPlaying = true;
+    document.getElementById('play-icon').style.display = 'none';
+    document.getElementById('pause-icon').style.display = '';
+    document.getElementById('music-toggle').classList.add('playing');
+    updateActiveItem();
+    updateNowPlaying();
+  };
+
+  window.prevSong = function() {
+    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+    audio.src = songs[currentIndex].file;
+    if (isPlaying) audio.play().catch(function() {});
+    updateActiveItem();
+    updateNowPlaying();
+  };
+
+  window.nextSong = function() {
+    currentIndex = (currentIndex + 1) % songs.length;
+    audio.src = songs[currentIndex].file;
+    if (isPlaying) audio.play().catch(function() {});
+    updateActiveItem();
+    updateNowPlaying();
+  };
+
+  function updateActiveItem() {
+    var items = document.querySelectorAll('.music-item');
+    items.forEach(function(item, i) {
+      item.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function updateNowPlaying() {
+    var np = document.getElementById('music-now-playing');
+    if (np) np.textContent = '正在播放: ' + songs[currentIndex].name + ' - ' + songs[currentIndex].artist;
+  }
+})();
+</script>
+
 </body>
 </html>
