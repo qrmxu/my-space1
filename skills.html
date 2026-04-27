@@ -1706,11 +1706,11 @@ document.querySelectorAll('.hobby-card').forEach(card => {
 (function() {
   // 歌曲列表 - 请将音乐文件放到 music/ 目录下
     var songs = [
-    { name: '星空漫步', artist: 'Ambient', file: 'music/song1.wav' },
-    { name: '午后阳光', artist: 'Chill', file: 'music/song2.wav' },
-    { name: '深夜思考', artist: 'Lo-fi', file: 'music/song3.wav' },
-    { name: '清晨微风', artist: 'Acoustic', file: 'music/song4.wav' },
-    { name: '月光小径', artist: 'Piano', file: 'music/song5.wav' },
+    { name: '星空漫步', artist: 'Ambient', file: '/music/song1.wav' },
+    { name: '午后阳光', artist: 'Chill', file: '/music/song2.wav' },
+    { name: '深夜思考', artist: 'Lo-fi', file: '/music/song3.wav' },
+    { name: '清晨微风', artist: 'Acoustic', file: '/music/song4.wav' },
+    { name: '月光小径', artist: 'Piano', file: '/music/song5.wav' },
   ];
 
   var currentIndex = 0;
@@ -1745,9 +1745,16 @@ document.querySelectorAll('.hobby-card').forEach(card => {
     nextSong();
   });
 
-  audio.addEventListener('error', function() {
+  audio.addEventListener('error', function(e) {
     var np = document.getElementById('music-now-playing');
-    if (np) np.textContent = '⚠️ 音乐文件未找到，请将 mp3 放到 music/ 目录';
+    var src = audio.src || '未知';
+    if (np) np.textContent = '⚠️ 加载失败: ' + src.split('/').pop();
+    console.error('音乐加载错误:', src, e);
+  });
+
+  audio.addEventListener('canplaythrough', function() {
+    var np = document.getElementById('music-now-playing');
+    if (np && isPlaying) np.textContent = '♪ ' + songs[currentIndex].name + ' - ' + songs[currentIndex].artist;
   });
 
   // 暴露到全局
