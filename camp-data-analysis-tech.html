@@ -762,7 +762,6 @@ function resetCode(btn){
   if(output){output.classList.remove('visible');output.innerHTML=''}
 }
 function runCode(btn){
-  if(!window.pyodide){alert('Python 环境尚未加载完成，请稍候...');return}
   var wrapper=btn.closest('.code-editor-wrapper');
   var textarea=wrapper.querySelector('.code-textarea');
   var output=wrapper.querySelector('.code-output');
@@ -771,6 +770,17 @@ function runCode(btn){
   btn.classList.add('loading');btn.disabled=true;
   output.classList.add('visible');output.classList.remove('error');
   output.innerHTML='<div class="code-output-header">运行中...</div><pre></pre>';
+  if(window.pyodide){
+    runPyodide(btn,wrapper,textarea,output,code);
+  } else if(window.pythonSim){
+    runSimulated(btn,wrapper,textarea,output,code);
+  } else {
+    btn.classList.remove('loading');btn.disabled=false;
+    output.classList.add('error');
+    output.innerHTML='<div class="code-output-header">错误</div><pre>Python 环境尚未就绪，请稍候重试...</pre>';
+  }
+}
+function runPyodide(btn,wrapper,textarea,output,code){
   window.pyodide.runPythonAsync(code).then(function(result){
     btn.classList.remove('loading');btn.disabled=false;
     var stdout=window.pyodide.runPython('import sys; sys.stdout.getvalue()');
@@ -783,12 +793,45 @@ function runCode(btn){
     output.innerHTML='<div class="code-output-header">错误</div><pre>'+escapeHtml(String(err))+'</pre>';
   });
 }
+function runSimulated(btn,wrapper,textarea,output,code){
+  try{
+    var result=window.pythonSim.run(code);
+    btn.classList.remove('loading');btn.disabled=false;
+    var text=result||'（无输出）';
+    output.innerHTML='<div class="code-output-header">输出结果（模拟器）</div><pre>'+escapeHtml(text)+'</pre>';
+  }catch(err){
+    btn.classList.remove('loading');btn.disabled=false;
+    output.classList.add('error');
+    output.innerHTML='<div class="code-output-header">错误</div><pre>'+escapeHtml(String(err))+'</pre>';
+  }
+}
 function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 
-// ========== Pyodide 加载 ==========
+// ========== Pyodide 加载（含超时回退） ==========
 (function(){
   var statusEl=document.getElementById('pyodideStatus'),dotEl=document.getElementById('pyodideDot'),textEl=document.getElementById('pyodideText'),progressEl=document.getElementById('pyodideProgress'),progressBar=document.getElementById('pyodideProgressBar');
   progressEl.classList.add('active');
+  var pyodideReady=false;
+  var TIMEOUT_MS=15000;
+
+  // 15秒超时：如果 Pyodide 没有加载成功，启用模拟器
+  var fallbackTimer=setTimeout(function(){
+    if(!pyodideReady){
+      console.warn('[Pyodide] 加载超时，启用 JavaScript Python 模拟器');
+      enableSimulator();
+    }
+  },TIMEOUT_MS);
+
+  function enableSimulator(){
+    window.pythonSim=createPythonSimulator();
+    dotEl.className='status-dot warning';
+    textEl.textContent='已启用 Python 模拟器（基础功能）';
+    progressBar.style.width='100%';
+    progressBar.style.background='#f59e0b';
+    setTimeout(function(){progressEl.classList.remove('active')},800);
+    document.querySelectorAll('.btn-run').forEach(function(b){b.disabled=false});
+  }
+
   var script=document.createElement('script');
   script.src='https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
   script.onload=function(){
@@ -796,52 +839,437 @@ function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').r
     loadPyodide({
       indexURL:'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
     }).then(function(pyodide){
+      pyodideReady=true;
+      clearTimeout(fallbackTimer);
       window.pyodide=pyodide;
       progressBar.style.width='100%';
       dotEl.className='status-dot ready';
       textEl.textContent='Python 运行环境已就绪';
       setTimeout(function(){progressEl.classList.remove('active')},500);
-      // 初始化 stdout 捕获
       pyodide.runPython('import sys, io; sys.stdout = io.StringIO()');
-      // 启用所有运行按钮
       document.querySelectorAll('.btn-run').forEach(function(b){b.disabled=false});
     }).catch(function(err){
-      dotEl.className='status-dot error';
-      textEl.textContent='Python 环境加载失败: '+err.message;
-      progressBar.style.width='100%';
-      progressBar.style.background='#ef4444';
+      clearTimeout(fallbackTimer);
+      if(!pyodideReady){
+        console.warn('[Pyodide] 初始化失败:',err.message);
+        enableSimulator();
+      }
     });
   };
   script.onerror=function(){
-    dotEl.className='status-dot error';
-    textEl.textContent='Pyodide 脚本加载失败，请检查网络连接';
+    clearTimeout(fallbackTimer);
+    if(!pyodideReady){
+      console.warn('[Pyodide] 脚本加载失败');
+      enableSimulator();
+    }
   };
   document.body.appendChild(script);
 })();
 
-// ========== SPA 导航 ==========
-(function(){
-  var mainContent=document.getElementById('main-content');
-  if(!mainContent)return;
-  document.addEventListener('click',function(e){
-    var link=e.target.closest('a[href]');
-    if(!link)return;
-    var href=link.getAttribute('href');
-    if(!href||!href.endsWith('.html'))return;
-    if(href===window.location.pathname.split('/').pop())return;
-    e.preventDefault();
-    mainContent.classList.add('fade-out');
-    setTimeout(function(){
-      fetch(href).then(function(r){return r.text()}).then(function(html){
-        var parser=new DOMParser(),doc=parser.parseFromString(html,'text/html');
-        var newContent=doc.getElementById('main-content');
-        if(newContent){mainContent.innerHTML=newContent.innerHTML;history.pushState(null,'',href);window.scrollTo(0,0)}
-        mainContent.classList.remove('fade-out');
-      }).catch(function(){window.location.href=href});
-    },250);
-  });
-  window.addEventListener('popstate',function(){window.location.reload()});
-})();
+// ========== JavaScript Python 模拟器 ==========
+function createPythonSimulator(){
+  var sim={
+    output:[],
+    vars:{},
+    run:function(code){
+      this.output=[];
+      this.vars={};
+      try{
+        var lines=this._preprocess(code);
+        this._execBlock(lines,0,lines.length);
+      }catch(e){
+        this.output.push('Error: '+e.message);
+      }
+      return this.output.join('\n');
+    },
+    _preprocess:function(code){
+      var raw=code.split('\n');
+      var lines=[];
+      for(var i=0;i<raw.length;i++){
+        var line=raw[i];
+        var indent=0;
+        while(indent<line.length&&(line[indent]===' '||line[indent]==='\t'))indent++;
+        var trimmed=line.trim();
+        if(trimmed===''||trimmed.startsWith('#'))continue;
+        lines.push({text:trimmed,indent:indent,raw:line});
+      }
+      return lines;
+    },
+    _execBlock:function(lines,start,end){
+      var i=start;
+      while(i<end){
+        var ln=lines[i];
+        var text=ln.text;
+        if(text.startsWith('import ')){
+          this.output.push('[模拟器] import 语句已忽略（模拟器不支持外部库）');
+          i++;continue;
+        }
+        if(text.startsWith('for ')&&text.includes(' in range(')){
+          i=this._execFor(lines,i,end);
+          continue;
+        }
+        if(text.startsWith('if ')){
+          i=this._execIf(lines,i,end);
+          continue;
+        }
+        this._execLine(text);
+        i++;
+      }
+    },
+    _execLine:function(text){
+      // print(...)
+      var pm=text.match(/^print\((.+)\)$/);
+      if(pm){
+        var args=this._evalExpr(pm[1]);
+        this.output.push(String(args));
+        return;
+      }
+      // variable assignment: x = expr  or  x += expr
+      var am=text.match(/^([a-zA-Z_]\w*)\s*([\+\-\*\/%]*=)\s*(.+)$/);
+      if(am){
+        var name=am[1],op=am[2],val=this._evalExpr(am[3]);
+        if(op==='+=')val=(this.vars[name]||0)+val;
+        else if(op==='-=')val=(this.vars[name]||0)-val;
+        else if(op==='*=')val=(this.vars[name]||0)*val;
+        else if(op==='/=')val=(this.vars[name]||0)/val;
+        this.vars[name]=val;
+        return;
+      }
+      // expression statement (just evaluate)
+      this._evalExpr(text);
+    },
+    _evalExpr:function(expr){
+      expr=expr.trim();
+      // handle f-string basic: f"..." or f'...'
+      if((expr.startsWith('f"')||expr.startsWith("f'"))){
+        return this._evalFString(expr);
+      }
+      // string literal
+      if((expr[0]==='"'&&expr[expr.length-1]==='"')||(expr[0]==="'"&&expr[expr.length-1]==="'")){
+        return expr.slice(1,-1);
+      }
+      // list literal
+      if(expr[0]==='['&&expr[expr.length-1]===']'){
+        return this._evalList(expr);
+      }
+      // function call: func(args)
+      var fc=expr.match(/^([a-zA-Z_]\w*)\((.*)\)$/);
+      if(fc){
+        return this._callFunc(fc[1],fc[2]);
+      }
+      // method call: expr.method(args)
+      var mc=expr.match(/^(.+)\.([a-zA-Z_]\w*)\((.*)\)$/);
+      if(mc){
+        var obj=this._evalExpr(mc[1]);
+        var method=mc[2],args=mc[3];
+        return this._callMethod(obj,method,args);
+      }
+      // index access: expr[idx]
+      var ia=expr.match(/^(.+)\[(.+)\]$/);
+      if(ia){
+        var arr=this._evalExpr(ia[1]);
+        var idx=this._evalExpr(ia[2]);
+        if(Array.isArray(arr))return arr[Math.floor(idx)];
+        if(typeof arr==='string')return arr[Math.floor(idx)];
+        return undefined;
+      }
+      // comparison operators: ==, !=, <, >, <=, >=
+      for(var ci=0;ci<this._cmpOps.length;ci++){
+        var op=this._cmpOps[ci];
+        var parts=this._splitOp(expr,op);
+        if(parts){
+          var lv=this._evalExpr(parts[0]),rv=this._evalExpr(parts[1]);
+          switch(op){
+            case '==':return lv===rv;case '!=':return lv!==rv;
+            case '<':return lv<rv;case '>':return lv>rv;
+            case '<=':return lv<=rv;case '>=':return lv>=rv;
+          }
+        }
+      }
+      // 'not' operator
+      if(expr==='True')return true;
+      if(expr==='False')return false;
+      if(expr==='None')return null;
+      if(expr==='not True')return false;
+      if(expr==='not False')return true;
+      // 'in' operator: x in list
+      var inM=expr.match(/^(.+)\s+in\s+(.+)$/);
+      if(inM){
+        var val=this._evalExpr(inM[1]);
+        var container=this._evalExpr(inM[2]);
+        if(Array.isArray(container))return container.indexOf(val)!==-1;
+        if(typeof container==='string')return container.indexOf(val)!==-1;
+        return false;
+      }
+      // arithmetic: handle +, -, *, /, //, %, **
+      // handle ** first (right associative)
+      var pp=this._splitOp(expr,'**');
+      if(pp)return Math.pow(this._evalExpr(pp[0]),this._evalExpr(pp[1]));
+      // handle *, /, //, %
+      for(var mi=0;mi<this._mulOps.length;mi++){
+        var mop=this._mulOps[mi];
+        var mp=this._splitOp(expr,mop);
+        if(mp){
+          var ml=this._evalExpr(mp[0]),mr=this._evalExpr(mp[1]);
+          switch(mop){
+            case '*':return ml*mr;case '/':return ml/mr;
+            case '//':return Math.floor(ml/mr);case '%':return ml%mr;
+          }
+        }
+      }
+      // handle +, -
+      for(var ai2=0;ai2<this._addOps.length;ai2++){
+        var aop=this._addOps[ai2];
+        var ap=this._splitOp(expr,aop);
+        if(ap){
+          var al=this._evalExpr(ap[0]),ar=this._evalExpr(ap[1]);
+          if(aop==='+'){
+            if(typeof al==='string'||typeof ar==='string')return String(al)+String(ar);
+            return al+ar;
+          }
+          return al-ar;
+        }
+      }
+      // parenthesized expression
+      if(expr[0]==='('&&this._findClose(expr,0)===expr.length-1){
+        return this._evalExpr(expr.slice(1,-1));
+      }
+      // unary minus
+      if(expr[0]==='-'&&expr.length>1){
+        return -this._evalExpr(expr.slice(1));
+      }
+      // variable lookup
+      if(/^[a-zA-Z_]\w*$/.test(expr)){
+        if(expr in this.vars)return this.vars[expr];
+        if(expr==='True')return true;
+        if(expr==='False')return false;
+        if(expr==='None')return null;
+        throw new Error("NameError: name '"+expr+"' is not defined");
+      }
+      // number
+      if(!isNaN(expr)&&expr!=='')return Number(expr);
+      throw new Error("SyntaxError: cannot evaluate '"+expr+"'");
+    },
+    _cmpOps:['==','!=','<=','>=','<','>'],
+    _mulOps:['**','*','//','/','%'],
+    _addOps:['+','-'],
+    _splitOp:function(expr,op){
+      // split on top-level operator (not inside strings/parens/brackets)
+      var depth=0,inStr=false,strCh='';
+      for(var i=0;i<expr.length;i++){
+        var c=expr[i];
+        if(inStr){if(c===strCh&&expr[i-1]!=='\\')inStr=false;continue}
+        if(c==='"'||c==="'"){inStr=true;strCh=c;continue}
+        if(c==='('||c==='[')depth++;
+        if(c===')'||c===']')depth--;
+        if(depth===0&&expr.substr(i,op.length)===op){
+          // avoid matching == when looking for =
+          if(op==='='&&i+1<expr.length&&(expr[i+1]==='='||expr[i-1]==='!'||expr[i-1]==='<'||expr[i-1]==='>'||expr[i-1]==='+'||expr[i-1]==='-'||expr[i-1]==='*'||expr[i-1]==='/'))continue;
+          // avoid matching single = when part of ==, !=, <=, >=
+          if(op==='='&&(i+1<expr.length&&expr[i+1]==='='))continue;
+          // avoid matching < when part of <=
+          if(op==='<'&&i+1<expr.length&&expr[i+1]==='=')continue;
+          // avoid matching > when part of >=
+          if(op==='>'&&i+1<expr.length&&expr[i+1]==='=')continue;
+          // avoid matching / when part of //
+          if(op==='/'&&i+1<expr.length&&expr[i+1]==='/')continue;
+          // avoid matching * when part of **
+          if(op==='*'&&i+1<expr.length&&expr[i+1]==='*')continue;
+          return[expr.slice(0,i),expr.slice(i+op.length)];
+        }
+      }
+      return null;
+    },
+    _findClose:function(s,openPos){
+      var ch=s[openPos],closeCh=ch==='('?')':ch==='['?']':'}';
+      var depth=0;
+      for(var i=openPos;i<s.length;i++){
+        if(s[i]===ch)depth++;
+        if(s[i]===closeCh)depth--;
+        if(depth===0)return i;
+      }
+      return -1;
+    },
+    _evalList:function(expr){
+      var inner=expr.slice(1,-1).trim();
+      if(inner==='')return[];
+      var items=this._splitArgs(inner);
+      var result=[];
+      for(var i=0;i<items.length;i++){
+        result.push(this._evalExpr(items[i].trim()));
+      }
+      return result;
+    },
+    _splitArgs:function(s){
+      var args=[],depth=0,inStr=false,strCh='',current='';
+      for(var i=0;i<s.length;i++){
+        var c=s[i];
+        if(inStr){current+=c;if(c===strCh&&s[i-1]!=='\\')inStr=false;continue}
+        if(c==='"'||c==="'"){inStr=true;strCh=c;current+=c;continue}
+        if(c==='('||c==='[')depth++;
+        if(c===')'||c===']')depth--;
+        if(c===','&&depth===0){args.push(current);current='';continue}
+        current+=c;
+      }
+      if(current.trim())args.push(current);
+      return args;
+    },
+    _callFunc:function(name,argsStr){
+      var args=this._splitArgs(argsStr);
+      var evaled=[];
+      for(var i=0;i<args.length;i++)evaled.push(this._evalExpr(args[i].trim()));
+      switch(name){
+        case 'len':return Array.isArray(evaled[0])?evaled[0].length:typeof evaled[0]==='string'?evaled[0].length:0;
+        case 'str':return String(evaled[0]);
+        case 'int':return parseInt(evaled[0],10);
+        case 'float':return parseFloat(evaled[0]);
+        case 'abs':return Math.abs(evaled[0]);
+        case 'round':return evaled.length>1?parseFloat(evaled[0].toFixed(evaled[1])):Math.round(evaled[0]);
+        case 'max':return Math.max.apply(null,evaled);
+        case 'min':return Math.min.apply(null,evaled);
+        case 'sum':return evaled[0].reduce(function(a,b){return a+b},0);
+        case 'range':
+          var start=0,stop=evaled[0],step=1;
+          if(evaled.length===2){start=evaled[0];stop=evaled[1]}
+          if(evaled.length===3){start=evaled[0];stop=evaled[1];step=evaled[2]}
+          var r=[];if(step>0)for(var j=start;j<stop;j+=step)r.push(j);
+          else if(step<0)for(var j=start;j>stop;j+=step)r.push(j);
+          return r;
+        case 'list':return Array.isArray(evaled[0])?evaled[0]:typeof evaled[0]==='string'?evaled[0].split(''):[evaled[0]];
+        case 'type':return typeof evaled[0];
+        case 'sorted':return Array.isArray(evaled[0])?evaled[0].slice().sort(function(a,b){return a-b}):evaled[0];
+        case 'reversed':
+          if(Array.isArray(evaled[0]))return evaled[0].slice().reverse();
+          if(typeof evaled[0]==='string')return evaled[0].split('').reverse().join('');
+          return evaled[0];
+        case 'enumerate':
+          if(!Array.isArray(evaled[0]))return[];
+          return evaled[0].map(function(v,i){return[i,v]});
+        case 'zip':
+          if(!Array.isArray(evaled[0])||!Array.isArray(evaled[1]))return[];
+          var minLen=Math.min(evaled[0].length,evaled[1].length);
+          var z=[];for(var zi=0;zi<minLen;zi++)z.push([evaled[0][zi],evaled[1][zi]]);
+          return z;
+        case 'input':return '';
+        default:throw new Error("NameError: function '"+name+"' is not available in simulator");
+      }
+    },
+    _callMethod:function(obj,method,argsStr){
+      var args=this._splitArgs(argsStr);
+      var evaled=[];
+      for(var i=0;i<args.length;i++)evaled.push(this._evalExpr(args[i].trim()));
+      if(!Array.isArray(obj)&&typeof obj!=='string'){
+        throw new Error("AttributeError: object has no method '"+method+"'");
+      }
+      switch(method){
+        case 'append':if(Array.isArray(obj))obj.push(evaled[0]);return null;
+        case 'extend':if(Array.isArray(obj)&&Array.isArray(evaled[0]))obj.push.apply(obj,evaled[0]);return null;
+        case 'pop':return Array.isArray(obj)?obj.pop():undefined;
+        case 'remove':
+          if(Array.isArray(obj)){var idx=obj.indexOf(evaled[0]);if(idx!==-1)obj.splice(idx,1)}
+          return null;
+        case 'insert':if(Array.isArray(obj))obj.splice(evaled[0],0,evaled[1]);return null;
+        case 'sort':if(Array.isArray(obj))obj.sort(function(a,b){return a-b});return null;
+        case 'reverse':if(Array.isArray(obj))obj.reverse();return null;
+        case 'count':return Array.isArray(obj)?obj.filter(function(x){return x===evaled[0]}).length:(typeof obj==='string'?obj.split(evaled[0]).length-1:0);
+        case 'index':
+          if(Array.isArray(obj))return obj.indexOf(evaled[0]);
+          if(typeof obj==='string')return obj.indexOf(evaled[0]);
+          return -1;
+        case 'upper':return typeof obj==='string'?obj.toUpperCase():obj;
+        case 'lower':return typeof obj==='string'?obj.toLowerCase():obj;
+        case 'strip':case 'trim':return typeof obj==='string'?obj.trim():obj;
+        case 'split':
+          if(typeof obj==='string')return evaled.length?obj.split(evaled[0]):obj.split(/\s+/);
+          return obj;
+        case 'join':
+          if(Array.isArray(obj))return obj.join(evaled[0]);
+          return obj;
+        case 'replace':
+          if(typeof obj==='string')return obj.split(evaled[0]).join(evaled[1]);
+          return obj;
+        case 'startswith':return typeof obj==='string'?obj.indexOf(evaled[0])===0:false;
+        case 'endswith':return typeof obj==='string'?obj.lastIndexOf(evaled[0])===obj.length-evaled[0].length:false;
+        case 'format':
+          if(typeof obj==='string'){
+            var result=obj;
+            for(var fi=0;fi<evaled.length;fi++){
+              result=result.replace('{}',String(evaled[fi]));
+            }
+            return result;
+          }
+          return obj;
+        default:throw new Error("AttributeError: '"+method+"' is not available in simulator");
+      }
+    },
+    _evalFString:function(expr){
+      var quote=expr[1];
+      var inner=expr.slice(2,-1);
+      var result=inner.replace(/\{([^}]+)\}/g,function(m,code){
+        try{return String(this._evalExpr(code))}catch(e){return m}
+      }.bind(this));
+      return result;
+    },
+    _execFor:function(lines,i,end){
+      var ln=lines[i];
+      var m=ln.text.match(/^for\s+(\w+)\s+in\s+(.+):$/);
+      if(!m)throw new Error("SyntaxError: invalid for loop at line "+(i+1));
+      var varName=m[1];
+      var iterExpr=m[2];
+      var iter=this._evalExpr(iterExpr);
+      if(!Array.isArray(iter))throw new Error("TypeError: '"+iterExpr+"' is not iterable");
+      // find block body
+      var bodyStart=i+1;
+      var bodyEnd=bodyStart;
+      var baseIndent=ln.indent;
+      while(bodyEnd<end&&lines[bodyEnd].indent>baseIndent)bodyEnd++;
+      // execute loop
+      for(var j=0;j<iter.length;j++){
+        this.vars[varName]=iter[j];
+        this._execBlock(lines,bodyStart,bodyEnd);
+      }
+      return bodyEnd;
+    },
+    _execIf:function(lines,i,end){
+      var ln=lines[i];
+      var m=ln.text.match(/^if\s+(.+):$/);
+      if(!m)throw new Error("SyntaxError: invalid if statement at line "+(i+1));
+      var cond=this._evalExpr(m[1]);
+      var baseIndent=ln.indent;
+      // find if body
+      var bodyStart=i+1;
+      var bodyEnd=bodyStart;
+      while(bodyEnd<end&&lines[bodyEnd].indent>baseIndent)bodyEnd++;
+      if(cond){
+        this._execBlock(lines,bodyStart,bodyEnd);
+      }
+      // check for elif / else
+      var next=bodyEnd;
+      if(next<end){
+        if(lines[next].text.startsWith('elif ')){
+          if(!cond)return this._execIf(lines,next,end);
+        }else if(lines[next].text==='else:'){
+          if(!cond){
+            var elseBodyStart=next+1;
+            var elseBodyEnd=elseBodyStart;
+            while(elseBodyEnd<end&&lines[elseBodyEnd].indent>baseIndent)elseBodyEnd++;
+            this._execBlock(lines,elseBodyStart,elseBodyEnd);
+          }else{
+            // skip else body
+            var skipStart=next+1;
+            var skipEnd=skipStart;
+            while(skipEnd<end&&lines[skipEnd].indent>baseIndent)skipEnd++;
+            return skipEnd;
+          }
+        }
+      }
+      return bodyEnd;
+    }
+  };
+  return sim;
+}
+
+
 </script>
 
 <!-- ========== 音乐播放器 ========== -->
